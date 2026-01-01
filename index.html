@@ -94,14 +94,6 @@
         .beacon-left { left: 0; }
         .beacon-right { right: 0; }
 
-        /* --- GLOW EFFECT (Triggered by Database) --- */
-        .card.active-pulse {
-            box-shadow: 0 0 30px var(--accent-color), inset 0 0 20px var(--accent-color);
-            border-color: var(--accent-color);
-            transform: scale(1.02);
-        }
-        .active-pulse .beacon-dot { transform: scale(1.5); background: white; }
-
         /* --- CLOCKS --- */
         .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .clock-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
@@ -143,6 +135,21 @@
 
         /* --- FOOTER --- */
         .visit-footer { text-align: center; font-size: 0.75rem; opacity: 0.5; margin-top: 20px; letter-spacing: 0.5px; }
+
+        /* --- HEART RAIN ANIMATION (NEW) --- */
+        .heart-particle {
+            position: fixed;
+            bottom: -50px;
+            font-size: 24px;
+            animation: floatUp 4s linear forwards;
+            z-index: 9999;
+            pointer-events: none; /* Make sure clicks pass through */
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
+        }
 
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
@@ -213,7 +220,7 @@
         <div class="card pulse-container">
             <div style="text-align: left;">
                 <div style="font-weight: bold;">Virtual Touch</div>
-                <div style="font-size: 0.8rem; opacity: 0.7;">Click to make her screen glow.</div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">Click to rain hearts on her screen.</div>
             </div>
             <button class="pulse-btn" id="pulseBtn">❤️</button>
         </div>
@@ -229,7 +236,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- YOUR CONFIGURATION ---
+        // --- YOUR KEYS ---
         const firebaseConfig = {
             apiKey: "AIzaSyBznon9j3zMoqT24mWZci29cfGGw41bT-U",
             authDomain: "st-pro-fd169.firebaseapp.com",
@@ -240,68 +247,69 @@
             appId: "1:197475448314:web:80500f982485c10bf32043"
         };
 
-        // Initialize Cloud Connection
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- 1. SEND LOVE (WRITE TO CLOUD) ---
+        // --- 1. SEND LOVE (CLICK) ---
         const pulseBtn = document.getElementById("pulseBtn");
         
         pulseBtn.addEventListener("click", () => {
-            // Animate button locally
             pulseBtn.classList.add('pulse-anim');
             setTimeout(() => pulseBtn.classList.remove('pulse-anim'), 1000);
-            
-            // Vibrate phone
             if (navigator.vibrate) navigator.vibrate([100]);
 
-            // Update Database: Increment counter safely
+            // Update Database
             const counterRef = ref(db, 'heartbeats/count');
             runTransaction(counterRef, (currentCount) => {
                 return (currentCount || 0) + 1;
             });
-
-            // Update Timestamp (To trigger visual effect)
             set(ref(db, 'heartbeats/lastPulse'), Date.now());
         });
 
-        // --- 2. RECEIVE LOVE (LISTEN TO CLOUD) ---
-        // A. Listen for Counter Updates
+        // --- 2. RECEIVE LOVE (LISTEN) ---
+        // A. Update Counter
         const globalCounter = document.getElementById("global-counter");
-        const countRef = ref(db, 'heartbeats/count');
-        
-        onValue(countRef, (snapshot) => {
+        onValue(ref(db, 'heartbeats/count'), (snapshot) => {
             const data = snapshot.val() || 0;
             globalCounter.innerText = data;
-            
-            // Highlight number when it changes
             globalCounter.classList.add('counter-highlight');
             setTimeout(() => globalCounter.classList.remove('counter-highlight'), 300);
         });
 
-        // B. Listen for Pulses (Visual Effect)
-        const pulseRef = ref(db, 'heartbeats/lastPulse');
-        const stringCard = document.getElementById("string-card");
-
-        onValue(pulseRef, (snapshot) => {
-            // Only trigger if data exists
+        // B. HEART RAIN EFFECT
+        onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
             if (snapshot.exists()) {
                 const lastPulseTime = snapshot.val();
-                const now = Date.now();
-                
-                // Only trigger if the pulse happened in the last 2 seconds
-                // (Prevents glowing on page load)
-                if (now - lastPulseTime < 2000) {
-                    stringCard.classList.add('active-pulse');
-                    
-                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-
-                    setTimeout(() => {
-                        stringCard.classList.remove('active-pulse');
-                    }, 1500);
+                // Only trigger if pulse is new (< 2 seconds old)
+                if (Date.now() - lastPulseTime < 2000) {
+                    createHeartRain(); // Call the magic function
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
                 }
             }
         });
+
+        // --- MAGIC HEART RAIN FUNCTION ---
+        function createHeartRain() {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart-particle');
+                    heart.innerHTML = '❤️';
+                    
+                    // Random Position & Speed
+                    heart.style.left = Math.random() * 100 + "vw";
+                    heart.style.animationDuration = (Math.random() * 2 + 3) + "s"; // 3s to 5s
+                    heart.style.fontSize = (Math.random() * 20 + 20) + "px"; // 20px to 40px
+                    
+                    document.body.appendChild(heart);
+
+                    // Remove after animation
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 5000);
+                }, i * 100); // Stagger the creation
+            }
+        }
     </script>
 
     <script>
