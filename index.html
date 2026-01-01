@@ -16,7 +16,7 @@
         :root {
             --bg-color: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%);
             --text-color: white;
-            --accent-color: #ff4d6d; /* The Red String Color */
+            --accent-color: #ff4d6d;
             --secondary-text: #cbd5e1;
             --card-bg: rgba(255,255,255,0.08);
             --card-border: rgba(255,255,255,0.1);
@@ -71,32 +71,19 @@
             text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* --- NEW: RED STRING COMPONENT --- */
+        /* --- RED STRING COMPONENT --- */
+        .string-card {
+            padding: 10px 20px 20px 20px;
+        }
         .string-wrapper {
-            position: relative; width: 100%; height: 120px;
+            position: relative; width: 100%; height: 80px;
             display: flex; align-items: center; justify-content: center;
+            margin-top: 10px;
         }
-        .string-svg {
-            width: 80%; height: 100%; overflow: visible;
-        }
-        .string-path {
-            fill: none;
-            stroke: var(--accent-color);
-            stroke-width: 2;
-            stroke-linecap: round;
-            filter: drop-shadow(0 0 5px var(--accent-color));
-            stroke-dasharray: 10;
-            animation: flow 20s linear infinite;
-        }
-        .string-knot {
-            font-size: 20px;
-            animation: knot-beat 1.5s infinite ease-in-out;
-            transform-box: fill-box;
-            transform-origin: center;
-        }
+        
         .beacon {
-            position: absolute; top: 50%; transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; align-items: center;
+            position: absolute; top: 50%; transform: translate(0, -50%);
+            display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
         .beacon-dot {
             width: 12px; height: 12px; background: var(--accent-color);
@@ -106,8 +93,9 @@
             margin-top: 15px; font-size: 0.7rem; font-weight: bold;
             color: var(--text-color); letter-spacing: 1px;
         }
-        .beacon-left { left: 10%; }
-        .beacon-right { left: 90%; }
+        /* Positioning dots at edges to match string end points */
+        .beacon-left { left: 0; }
+        .beacon-right { right: 0; }
 
         /* --- CLOCKS & COUNTER --- */
         .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -149,8 +137,6 @@
         .visit-footer { text-align: center; font-size: 0.75rem; opacity: 0.5; margin-top: 20px; letter-spacing: 0.5px; }
 
         /* ANIMATIONS */
-        @keyframes flow { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
-        @keyframes knot-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -169,23 +155,31 @@
 
     <div class="dashboard">
         
-        <div class="card">
+        <div class="card string-card">
             <div class="clock-label" style="text-align: center;">THE RED STRING</div>
+            
             <div class="string-wrapper">
+                
                 <div class="beacon beacon-left">
                     <div class="beacon-dot"></div>
                     <div class="beacon-label">ALBIN</div>
                 </div>
-                
-                <svg class="string-svg" viewBox="0 0 300 60" preserveAspectRatio="none">
-                    <path d="M 10,30 Q 150,60 290,30" class="string-path" />
-                    <text x="150" y="45" text-anchor="middle" dominant-baseline="middle" class="string-knot" fill="var(--accent-color)">❤️</text>
-                </svg>
+
+                <lottie-player 
+                    src="string.json" 
+                    background="transparent"  
+                    speed="1"  
+                    style="width: 100%; height: 100%; opacity: 0.9;"  
+                    loop  
+                    autoplay
+                    preserveAspectRatio="none">
+                </lottie-player>
 
                 <div class="beacon beacon-right">
                     <div class="beacon-dot"></div>
                     <div class="beacon-label">TAA</div>
                 </div>
+
             </div>
         </div>
 
