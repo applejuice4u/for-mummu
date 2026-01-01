@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bubu & Mummuu's Home</title>
+    <title>Mummuu's Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
     <style>
         /* --- CSS VARIABLES --- */
         :root {
@@ -37,7 +39,7 @@
             min-height: 100vh;
             transition: background 0.8s ease;
             overflow-x: hidden;
-            padding-bottom: 50px; /* Space for scrolling */
+            padding-bottom: 50px;
         }
 
         /* --- BACKGROUND STARS --- */
@@ -45,10 +47,7 @@
         .star { position: absolute; background: var(--star-color); border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
 
         /* --- HEADER --- */
-        header {
-            text-align: center;
-            padding: 30px 20px 10px;
-        }
+        header { text-align: center; padding: 30px 20px 10px; }
         h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--accent-color); }
         .subtitle { font-size: 0.9rem; color: var(--secondary-text); opacity: 0.8; }
 
@@ -60,30 +59,21 @@
 
         /* --- DASHBOARD GRID --- */
         .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+            max-width: 500px; margin: 0 auto; padding: 20px;
         }
 
-        /* --- GENERIC CARD STYLE --- */
+        /* --- CARD STYLE --- */
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         /* --- WIDGET 1: FLIGHT PATH --- */
         .flight-wrapper {
             position: relative; width: 100%; height: 100px;
-            display: flex; align-items: center; justify-content: center;
-            margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; margin-top: 10px;
         }
         .flight-line {
             position: absolute; width: 70%; height: 2px;
@@ -110,71 +100,55 @@
         }
 
         /* --- WIDGET 2: TIME & COUNTER --- */
-        .time-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
+        .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .clock-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
         .clock-time { font-size: 1.2rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; }
         
-        .counter-card { grid-column: span 2; } /* Full width */
+        .counter-card { grid-column: span 2; } 
         .counter-num { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
         .counter-text { font-size: 0.8rem; opacity: 0.8; }
 
-        /* --- WIDGET 3: STATUS --- */
-        .status-badge {
-            display: inline-block;
-            background: rgba(255, 77, 109, 0.2);
-            color: var(--accent-color);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 5px;
+        /* --- WIDGET 3: ANIMATED CAT (NEW) --- */
+        .cat-card {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 180px;
+        }
+        .cat-caption {
+            font-size: 0.8rem; margin-top: -10px; opacity: 0.7; font-style: italic;
         }
 
         /* --- WIDGET 4: LOVE JAR --- */
         .love-jar-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            transition: transform 0.1s;
+            background: var(--accent-color); color: white; border: none;
+            padding: 12px 25px; border-radius: 50px; font-size: 1rem;
+            cursor: pointer; width: 100%; font-family: 'Poppins', sans-serif;
+            font-weight: 600; transition: transform 0.1s;
         }
         .love-jar-btn:active { transform: scale(0.95); }
         #jar-content {
-            margin-top: 15px;
-            min-height: 40px;
-            font-style: italic;
-            color: var(--secondary-text);
-            font-size: 0.95rem;
-            display: none;
+            margin-top: 15px; min-height: 40px; font-style: italic;
+            color: var(--secondary-text); font-size: 0.95rem; display: none;
             animation: fadeIn 0.5s;
         }
 
         /* --- WIDGET 5: PULSE --- */
-        .pulse-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .pulse-container { display: flex; align-items: center; justify-content: space-between; }
         .pulse-btn {
             background: none; border: 2px solid var(--accent-color);
-            color: var(--accent-color);
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
+            color: var(--accent-color); width: 50px; height: 50px;
+            border-radius: 50%; font-size: 1.5rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
         .pulse-anim { animation: heartbeat 0.6s infinite; }
+
+        /* --- VISIT COUNTER --- */
+        .visit-footer {
+            text-align: center;
+            font-size: 0.75rem;
+            opacity: 0.5;
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
 
         /* ANIMATIONS */
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -226,12 +200,16 @@
             </div>
         </div>
 
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="text-align: left;">
-                <div style="font-weight: bold; font-size: 0.9rem;">Bubu's Current Status:</div>
-                <div style="font-size: 0.8rem; opacity: 0.7;">Updated: Forever</div>
-            </div>
-            <div class="status-badge">Missing You</div>
+        <div class="card cat-card">
+            <lottie-player 
+                src="https://assets10.lottiefiles.com/packages/lf20_C3K0Hh.json"  
+                background="transparent"  
+                speed="1"  
+                style="width: 150px; height: 150px;"  
+                loop  
+                autoplay>
+            </lottie-player>
+            <div class="cat-caption">I'm guarding Bubu's love for you.</div>
         </div>
 
         <div class="card">
@@ -245,6 +223,10 @@
                 <div style="font-size: 0.8rem; opacity: 0.7;">Press the heart to feel me.</div>
             </div>
             <button class="pulse-btn" id="pulseBtn" onclick="triggerPulse()">❤️</button>
+        </div>
+
+        <div class="visit-footer" id="visit-display">
+            You've visited home: 1 time 💛
         </div>
 
     </div>
@@ -263,15 +245,12 @@
             starsContainer.appendChild(star);
         }
 
-        // --- CLOCKS (Live) ---
+        // --- CLOCKS ---
         function updateClocks() {
             const now = new Date();
-            
-            // India (UTC +5:30)
             const optionsIndia = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false };
             document.getElementById('time-india').innerText = now.toLocaleTimeString('en-US', optionsIndia);
 
-            // Indonesia (Western/Jakarta UTC +7:00)
             const optionsIndo = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false };
             document.getElementById('time-indo').innerText = now.toLocaleTimeString('en-US', optionsIndo);
         }
@@ -284,7 +263,13 @@
         const diffDays = Math.ceil(Math.abs(today - startDate) / (1000 * 60 * 60 * 24)); 
         document.getElementById('days-count').innerText = diffDays;
 
-        // --- LOVE JAR MESSAGES ---
+        // --- VISIT COUNTER ---
+        let visitCount = localStorage.getItem('visitCount');
+        if (!visitCount) { visitCount = 1; } else { visitCount = parseInt(visitCount) + 1; }
+        localStorage.setItem('visitCount', visitCount);
+        document.getElementById('visit-display').innerText = `You've visited home: ${visitCount} times 💛`;
+
+        // --- LOVE JAR ---
         const messages = [
             "You are my favorite notification. 📱",
             "Drink some water, my Sayang! 💧",
@@ -299,7 +284,6 @@
             "I am working hard so we can meet soon. 💼",
             "Everything is going to be okay. Bubu is here."
         ];
-
         function openJar() {
             const display = document.getElementById('jar-content');
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
@@ -311,13 +295,8 @@
         function triggerPulse() {
             const btn = document.getElementById('pulseBtn');
             btn.classList.add('pulse-anim');
-            
-            // Vibrate phone if supported
             if (navigator.vibrate) navigator.vibrate([200]);
-
-            setTimeout(() => {
-                btn.classList.remove('pulse-anim');
-            }, 1000);
+            setTimeout(() => { btn.classList.remove('pulse-anim'); }, 1000);
         }
     </script>
 </body>
