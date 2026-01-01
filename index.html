@@ -71,29 +71,32 @@
             text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* --- RED STRING COMPONENT --- */
+        /* --- RED STRING COMPONENT (CLEANED UP) --- */
         .string-card {
-            padding: 10px 20px 20px 20px;
+            /* Tighter padding for a cleaner look */
+            padding: 15px 20px; 
         }
         .string-wrapper {
-            position: relative; width: 100%; height: 80px;
+            position: relative; width: 100%; 
+            /* Reduced height to align string better with dots */
+            height: 60px; 
             display: flex; align-items: center; justify-content: center;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         .beacon {
+            /* Centered vertically within the tighter 60px height */
             position: absolute; top: 50%; transform: translate(0, -50%);
             display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
         .beacon-dot {
             width: 12px; height: 12px; background: var(--accent-color);
-            border-radius: 50%; box-shadow: 0 0 10px var(--accent-color);
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
         }
         .beacon-label {
-            margin-top: 15px; font-size: 0.7rem; font-weight: bold;
+            margin-top: 10px; font-size: 0.7rem; font-weight: bold;
             color: var(--text-color); letter-spacing: 1px;
         }
-        /* Positioning dots at edges to match string end points */
         .beacon-left { left: 0; }
         .beacon-right { right: 0; }
 
@@ -156,7 +159,7 @@
     <div class="dashboard">
         
         <div class="card string-card">
-            <div class="clock-label" style="text-align: center;">THE RED STRING</div>
+            <div class="clock-label" style="text-align: center; margin-bottom: 10px;">THE RED STRING</div>
             
             <div class="string-wrapper">
                 
@@ -169,7 +172,7 @@
                     src="string.json" 
                     background="transparent"  
                     speed="1"  
-                    style="width: 100%; height: 100%; opacity: 0.9;"  
+                    style="width: 100%; height: 100%; opacity: 1.0;"  
                     loop  
                     autoplay
                     preserveAspectRatio="none">
