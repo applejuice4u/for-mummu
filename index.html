@@ -69,29 +69,23 @@
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
             text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s, transform 0.3s;
         }
 
-        /* --- RED STRING COMPONENT (CLEANED UP) --- */
-        .string-card {
-            /* Tighter padding for a cleaner look */
-            padding: 15px 20px; 
-        }
+        /* --- RED STRING --- */
+        .string-card { padding: 15px 20px; }
         .string-wrapper {
-            position: relative; width: 100%; 
-            /* Reduced height to align string better with dots */
-            height: 60px; 
-            display: flex; align-items: center; justify-content: center;
-            margin-top: 5px;
+            position: relative; width: 100%; height: 60px; 
+            display: flex; align-items: center; justify-content: center; margin-top: 5px;
         }
-        
         .beacon {
-            /* Centered vertically within the tighter 60px height */
             position: absolute; top: 50%; transform: translate(0, -50%);
             display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
         .beacon-dot {
             width: 12px; height: 12px; background: var(--accent-color);
             border-radius: 50%; box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            transition: transform 0.3s;
         }
         .beacon-label {
             margin-top: 10px; font-size: 0.7rem; font-weight: bold;
@@ -100,13 +94,24 @@
         .beacon-left { left: 0; }
         .beacon-right { right: 0; }
 
-        /* --- CLOCKS & COUNTER --- */
+        /* --- GLOW EFFECT (Triggered by Database) --- */
+        .card.active-pulse {
+            box-shadow: 0 0 30px var(--accent-color), inset 0 0 20px var(--accent-color);
+            border-color: var(--accent-color);
+            transform: scale(1.02);
+        }
+        .active-pulse .beacon-dot { transform: scale(1.5); background: white; }
+
+        /* --- CLOCKS --- */
         .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .clock-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
         .clock-time { font-size: 1.2rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; }
+        
+        /* --- GLOBAL COUNTER --- */
         .counter-card { grid-column: span 2; } 
-        .counter-num { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
+        .counter-num { font-size: 2rem; font-weight: bold; color: var(--accent-color); transition: transform 0.2s; }
         .counter-text { font-size: 0.8rem; opacity: 0.8; }
+        .counter-highlight { color: #fff; transform: scale(1.2); }
 
         /* --- CAT --- */
         .cat-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
@@ -139,7 +144,6 @@
         /* --- FOOTER --- */
         .visit-footer { text-align: center; font-size: 0.75rem; opacity: 0.5; margin-top: 20px; letter-spacing: 0.5px; }
 
-        /* ANIMATIONS */
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -153,36 +157,27 @@
 
     <header>
         <h1>Mummuu's Dashboard</h1>
-        <div class="subtitle">Connected by fate, separated by miles.</div>
+        <div class="subtitle">Connected by fate, synced by love.</div>
     </header>
 
     <div class="dashboard">
         
-        <div class="card string-card">
+        <div class="card string-card" id="string-card">
             <div class="clock-label" style="text-align: center; margin-bottom: 10px;">THE RED STRING</div>
-            
             <div class="string-wrapper">
-                
                 <div class="beacon beacon-left">
                     <div class="beacon-dot"></div>
                     <div class="beacon-label">ALBIN</div>
                 </div>
-
                 <lottie-player 
-                    src="string.json" 
-                    background="transparent"  
-                    speed="1"  
+                    src="string.json" background="transparent" speed="1"  
                     style="width: 100%; height: 100%; opacity: 1.0;"  
-                    loop  
-                    autoplay
-                    preserveAspectRatio="none">
+                    loop autoplay preserveAspectRatio="none">
                 </lottie-player>
-
                 <div class="beacon beacon-right">
                     <div class="beacon-dot"></div>
                     <div class="beacon-label">TAA</div>
                 </div>
-
             </div>
         </div>
 
@@ -195,20 +190,17 @@
                 <div class="clock-label">INDO (SAYANG)</div>
                 <div class="clock-time" id="time-indo">--:--</div>
             </div>
+            
             <div class="card counter-card">
-                <div class="counter-num" id="days-count">0</div>
-                <div class="counter-text">Days since we found each other ❤️</div>
+                <div class="counter-num" id="global-counter">Loading...</div>
+                <div class="counter-text">Total times we touched hearts ❤️</div>
             </div>
         </div>
 
         <div class="card cat-card">
             <lottie-player 
-                src="cat.json"  
-                background="transparent"  
-                speed="1"  
-                style="width: 150px; height: 150px;"  
-                loop  
-                autoplay>
+                src="cat.json" background="transparent" speed="1"  
+                style="width: 150px; height: 150px;" loop autoplay>
             </lottie-player>
             <div class="cat-caption">Guarding Bubu's love for you.</div>
         </div>
@@ -221,9 +213,9 @@
         <div class="card pulse-container">
             <div style="text-align: left;">
                 <div style="font-weight: bold;">Virtual Touch</div>
-                <div style="font-size: 0.8rem; opacity: 0.7;">Press the heart to feel me.</div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">Click to make her screen glow.</div>
             </div>
-            <button class="pulse-btn" id="pulseBtn" onclick="triggerPulse()">❤️</button>
+            <button class="pulse-btn" id="pulseBtn">❤️</button>
         </div>
 
         <div class="visit-footer" id="visit-display">
@@ -232,8 +224,88 @@
 
     </div>
 
+    <script type="module">
+        // Import Firebase Functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // --- YOUR CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBznon9j3zMoqT24mWZci29cfGGw41bT-U",
+            authDomain: "st-pro-fd169.firebaseapp.com",
+            databaseURL: "https://st-pro-fd169-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "st-pro-fd169",
+            storageBucket: "st-pro-fd169.firebasestorage.app",
+            messagingSenderId: "197475448314",
+            appId: "1:197475448314:web:80500f982485c10bf32043"
+        };
+
+        // Initialize Cloud Connection
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- 1. SEND LOVE (WRITE TO CLOUD) ---
+        const pulseBtn = document.getElementById("pulseBtn");
+        
+        pulseBtn.addEventListener("click", () => {
+            // Animate button locally
+            pulseBtn.classList.add('pulse-anim');
+            setTimeout(() => pulseBtn.classList.remove('pulse-anim'), 1000);
+            
+            // Vibrate phone
+            if (navigator.vibrate) navigator.vibrate([100]);
+
+            // Update Database: Increment counter safely
+            const counterRef = ref(db, 'heartbeats/count');
+            runTransaction(counterRef, (currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+
+            // Update Timestamp (To trigger visual effect)
+            set(ref(db, 'heartbeats/lastPulse'), Date.now());
+        });
+
+        // --- 2. RECEIVE LOVE (LISTEN TO CLOUD) ---
+        // A. Listen for Counter Updates
+        const globalCounter = document.getElementById("global-counter");
+        const countRef = ref(db, 'heartbeats/count');
+        
+        onValue(countRef, (snapshot) => {
+            const data = snapshot.val() || 0;
+            globalCounter.innerText = data;
+            
+            // Highlight number when it changes
+            globalCounter.classList.add('counter-highlight');
+            setTimeout(() => globalCounter.classList.remove('counter-highlight'), 300);
+        });
+
+        // B. Listen for Pulses (Visual Effect)
+        const pulseRef = ref(db, 'heartbeats/lastPulse');
+        const stringCard = document.getElementById("string-card");
+
+        onValue(pulseRef, (snapshot) => {
+            // Only trigger if data exists
+            if (snapshot.exists()) {
+                const lastPulseTime = snapshot.val();
+                const now = Date.now();
+                
+                // Only trigger if the pulse happened in the last 2 seconds
+                // (Prevents glowing on page load)
+                if (now - lastPulseTime < 2000) {
+                    stringCard.classList.add('active-pulse');
+                    
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+                    setTimeout(() => {
+                        stringCard.classList.remove('active-pulse');
+                    }, 1500);
+                }
+            }
+        });
+    </script>
+
     <script>
-        // --- STARS ---
+        // STARS
         const starsContainer = document.getElementById('star-container');
         for(let i=0; i<50; i++) {
             let star = document.createElement('div');
@@ -246,7 +318,7 @@
             starsContainer.appendChild(star);
         }
 
-        // --- CLOCKS ---
+        // CLOCKS
         function updateClocks() {
             const now = new Date();
             const optionsIndia = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false };
@@ -257,19 +329,7 @@
         setInterval(updateClocks, 1000);
         updateClocks();
 
-        // --- COUNTER ---
-        const startDate = new Date("2025-10-21");
-        const today = new Date();
-        const diffDays = Math.ceil(Math.abs(today - startDate) / (1000 * 60 * 60 * 24)); 
-        document.getElementById('days-count').innerText = diffDays;
-
-        // --- VISIT COUNTER ---
-        let visitCount = localStorage.getItem('visitCount');
-        if (!visitCount) { visitCount = 1; } else { visitCount = parseInt(visitCount) + 1; }
-        localStorage.setItem('visitCount', visitCount);
-        document.getElementById('visit-display').innerText = `You've visited home: ${visitCount} times 💛`;
-
-        // --- LOVE JAR ---
+        // LOVE JAR
         const messages = [
             "You are my favorite notification. 📱",
             "Drink some water, my Sayang! 💧",
@@ -291,13 +351,11 @@
             display.innerText = '"' + randomMsg + '"';
         }
 
-        // --- PULSE ---
-        function triggerPulse() {
-            const btn = document.getElementById('pulseBtn');
-            btn.classList.add('pulse-anim');
-            if (navigator.vibrate) navigator.vibrate([200]);
-            setTimeout(() => { btn.classList.remove('pulse-anim'); }, 1000);
-        }
+        // LOCAL VISIT COUNTER
+        let visitCount = localStorage.getItem('visitCount');
+        if (!visitCount) { visitCount = 1; } else { visitCount = parseInt(visitCount) + 1; }
+        localStorage.setItem('visitCount', visitCount);
+        document.getElementById('visit-display').innerText = `You've visited home: ${visitCount} times 💛`;
     </script>
 </body>
 </html>
