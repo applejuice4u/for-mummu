@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mummuu's Dashboard</title>
+    
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
     <style>
-        /* --- CSS VARIABLES --- */
+        /* --- VARIABLES --- */
         :root {
             --bg-color: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%);
             --text-color: white;
-            --accent-color: #ff4d6d;
+            --accent-color: #ff4d6d; /* The Red String Color */
             --secondary-text: #cbd5e1;
-            --card-bg: rgba(255,255,255,0.08); /* Glass effect */
+            --card-bg: rgba(255,255,255,0.08);
             --card-border: rgba(255,255,255,0.1);
             --star-color: white;
         }
 
-        /* DAY MODE */
         body.day-mode {
             --bg-color: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
             --text-color: #5d4037;
@@ -32,7 +33,7 @@
             --star-color: #fbc02d;
         }
 
-        /* --- RESET & BODY --- */
+        /* --- CORE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
@@ -44,7 +45,7 @@
             padding-bottom: 50px;
         }
 
-        /* --- BACKGROUND STARS --- */
+        /* --- STARS --- */
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
         .star { position: absolute; background: var(--star-color); border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
 
@@ -59,67 +60,68 @@
             padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
         }
 
-        /* --- DASHBOARD GRID --- */
+        /* --- DASHBOARD --- */
         .dashboard {
             display: flex; flex-direction: column; gap: 15px;
             max-width: 500px; margin: 0 auto; padding: 20px;
         }
-
-        /* --- CARD STYLE --- */
         .card {
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
             text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* --- WIDGET 1: FLIGHT PATH --- */
-        .flight-wrapper {
-            position: relative; width: 100%; height: 100px;
-            display: flex; align-items: center; justify-content: center; margin-top: 10px;
+        /* --- NEW: RED STRING COMPONENT --- */
+        .string-wrapper {
+            position: relative; width: 100%; height: 120px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .flight-line {
-            position: absolute; width: 70%; height: 2px;
-            background: repeating-linear-gradient(to right, var(--accent-color) 0, var(--accent-color) 5px, transparent 5px, transparent 10px);
-            opacity: 0.5;
+        .string-svg {
+            width: 80%; height: 100%; overflow: visible;
+        }
+        .string-path {
+            fill: none;
+            stroke: var(--accent-color);
+            stroke-width: 2;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 5px var(--accent-color));
+            stroke-dasharray: 10;
+            animation: flow 20s linear infinite;
+        }
+        .string-knot {
+            font-size: 20px;
+            animation: knot-beat 1.5s infinite ease-in-out;
+            transform-box: fill-box;
+            transform-origin: center;
         }
         .beacon {
             position: absolute; top: 50%; transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; align-items: center; z-index: 5;
+            display: flex; flex-direction: column; align-items: center;
         }
         .beacon-dot {
-            width: 14px; height: 14px; background: var(--accent-color);
+            width: 12px; height: 12px; background: var(--accent-color);
             border-radius: 50%; box-shadow: 0 0 10px var(--accent-color);
         }
         .beacon-label {
-            margin-top: 20px; font-size: 0.7rem; font-weight: bold;
+            margin-top: 15px; font-size: 0.7rem; font-weight: bold;
             color: var(--text-color); letter-spacing: 1px;
         }
-        .beacon-left { left: 15%; }
-        .beacon-right { left: 85%; }
-        .plane-icon { 
-            font-size: 24px; position: absolute; left: 50%; top: 50%;
-            transform: translate(-50%, -50%) rotate(90deg);
-        }
+        .beacon-left { left: 10%; }
+        .beacon-right { left: 90%; }
 
-        /* --- WIDGET 2: TIME & COUNTER --- */
+        /* --- CLOCKS & COUNTER --- */
         .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .clock-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
         .clock-time { font-size: 1.2rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; }
-        
         .counter-card { grid-column: span 2; } 
         .counter-num { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
         .counter-text { font-size: 0.8rem; opacity: 0.8; }
 
-        /* --- WIDGET 3: ANIMATED CAT (NEW) --- */
-        .cat-card {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 180px;
-        }
-        .cat-caption {
-            font-size: 0.8rem; margin-top: -10px; opacity: 0.7; font-style: italic;
-        }
+        /* --- CAT --- */
+        .cat-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
+        .cat-caption { font-size: 0.8rem; margin-top: -10px; opacity: 0.7; font-style: italic; }
 
-        /* --- WIDGET 4: LOVE JAR --- */
+        /* --- LOVE JAR --- */
         .love-jar-btn {
             background: var(--accent-color); color: white; border: none;
             padding: 12px 25px; border-radius: 50px; font-size: 1rem;
@@ -133,7 +135,7 @@
             animation: fadeIn 0.5s;
         }
 
-        /* --- WIDGET 5: PULSE --- */
+        /* --- PULSE --- */
         .pulse-container { display: flex; align-items: center; justify-content: space-between; }
         .pulse-btn {
             background: none; border: 2px solid var(--accent-color);
@@ -143,16 +145,12 @@
         }
         .pulse-anim { animation: heartbeat 0.6s infinite; }
 
-        /* --- VISIT COUNTER --- */
-        .visit-footer {
-            text-align: center;
-            font-size: 0.75rem;
-            opacity: 0.5;
-            margin-top: 20px;
-            letter-spacing: 0.5px;
-        }
+        /* --- FOOTER --- */
+        .visit-footer { text-align: center; font-size: 0.75rem; opacity: 0.5; margin-top: 20px; letter-spacing: 0.5px; }
 
         /* ANIMATIONS */
+        @keyframes flow { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+        @keyframes knot-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -166,24 +164,28 @@
 
     <header>
         <h1>Mummuu's Dashboard</h1>
-        <div class="subtitle">A little piece of Bubu, always with you.</div>
+        <div class="subtitle">Connected by fate, separated by miles.</div>
     </header>
 
     <div class="dashboard">
         
         <div class="card">
-            <div class="clock-label" style="text-align: center;">OUR CONNECTION</div>
-            <div class="flight-wrapper">
-                <div class="flight-line"></div>
+            <div class="clock-label" style="text-align: center;">THE RED STRING</div>
+            <div class="string-wrapper">
                 <div class="beacon beacon-left">
                     <div class="beacon-dot"></div>
                     <div class="beacon-label">ALBIN</div>
                 </div>
+                
+                <svg class="string-svg" viewBox="0 0 300 60" preserveAspectRatio="none">
+                    <path d="M 10,30 Q 150,60 290,30" class="string-path" />
+                    <text x="150" y="45" text-anchor="middle" dominant-baseline="middle" class="string-knot" fill="var(--accent-color)">❤️</text>
+                </svg>
+
                 <div class="beacon beacon-right">
                     <div class="beacon-dot"></div>
                     <div class="beacon-label">TAA</div>
                 </div>
-                <div class="plane-icon">✈️</div>
             </div>
         </div>
 
@@ -211,7 +213,7 @@
                 loop  
                 autoplay>
             </lottie-player>
-            <div class="cat-caption">I'm guarding Bubu's love for you.</div>
+            <div class="cat-caption">Guarding Bubu's love for you.</div>
         </div>
 
         <div class="card">
@@ -252,7 +254,6 @@
             const now = new Date();
             const optionsIndia = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false };
             document.getElementById('time-india').innerText = now.toLocaleTimeString('en-US', optionsIndia);
-
             const optionsIndo = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false };
             document.getElementById('time-indo').innerText = now.toLocaleTimeString('en-US', optionsIndo);
         }
@@ -276,14 +277,14 @@
             "You are my favorite notification. 📱",
             "Drink some water, my Sayang! 💧",
             "Bubu is thinking of you right now. 💭",
-            "You look beautiful today (I just know it). ✨",
-            "I'm so proud of how hard you study. 📚",
-            "Just a reminder: I love you more. ❤️",
+            "You look beautiful today. ✨",
+            "I'm proud of your hard work. 📚",
+            "I love you more than yesterday. ❤️",
             "Distance means nothing when you mean everything. 🌍",
             "Sending you a giant virtual hug! 🤗",
-            "You are the best thing that happened in 2025. 🌟",
+            "You are the best thing in my 2025. 🌟",
             "Keep smiling, Muthe. It's my favorite view.",
-            "I am working hard so we can meet soon. 💼",
+            "I'm working hard so we can meet soon. 💼",
             "Everything is going to be okay. Bubu is here."
         ];
         function openJar() {
@@ -303,5 +304,3 @@
     </script>
 </body>
 </html>
-
-
