@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For My Mummuu</title>
+    <title>Bubu & Mummuu's Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <style>
         /* --- CSS VARIABLES --- */
@@ -12,7 +12,7 @@
             --text-color: white;
             --accent-color: #ff4d6d;
             --secondary-text: #cbd5e1;
-            --card-bg: rgba(255,255,255,0.05);
+            --card-bg: rgba(255,255,255,0.08); /* Glass effect */
             --card-border: rgba(255,255,255,0.1);
             --star-color: white;
         }
@@ -28,338 +28,229 @@
             --star-color: #fbc02d;
         }
 
-        /* --- CORE STYLES --- */
+        /* --- RESET & BODY --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
-            overflow-x: hidden;
-            text-align: center;
             min-height: 100vh;
-            transition: background 0.8s ease, color 0.8s ease;
+            transition: background 0.8s ease;
+            overflow-x: hidden;
+            padding-bottom: 50px; /* Space for scrolling */
         }
 
-        /* Theme Toggle */
-        .theme-toggle {
-            position: fixed; top: 20px; right: 20px;
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            padding: 10px; border-radius: 50%; cursor: pointer; z-index: 1000;
-            font-size: 1.2rem; backdrop-filter: blur(5px);
-        }
-
-        /* Stars */
+        /* --- BACKGROUND STARS --- */
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
         .star { position: absolute; background: var(--star-color); border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
 
-        /* Screen Management */
-        .screen {
-            min-height: 100vh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            padding: 20px 20px 80px 20px;
-            transition: opacity 0.8s ease; position: absolute; width: 100%; top: 0; left: 0;
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            padding: 30px 20px 10px;
         }
-        .hidden { opacity: 0; pointer-events: none; z-index: -1; display: none; }
-        .active { opacity: 1; pointer-events: all; z-index: 10; display: flex; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--accent-color); }
+        .subtitle { font-size: 0.9rem; color: var(--secondary-text); opacity: 0.8; }
 
-        /* Typography */
-        h1 { font-family: 'Dancing Script', cursive; font-size: 3rem; color: var(--accent-color); margin-bottom: 10px; }
-        h2 { font-size: 1.5rem; margin: 20px 0 10px 0; }
-        p { font-size: 1rem; color: var(--secondary-text); line-height: 1.6; max-width: 90%; margin: 0 auto; }
-        .small-text { font-size: 0.8rem; opacity: 0.7; margin-top: 5px; }
-
-        /* --- ABSTRACT FLIGHT PATH --- */
-        .flight-path-wrapper {
-            position: relative; width: 100%; max-width: 350px; height: 180px;
-            margin: 40px auto; display: flex; align-items: center; justify-content: center;
+        .theme-toggle {
+            position: absolute; top: 20px; right: 20px;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
         }
-        
+
+        /* --- DASHBOARD GRID --- */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- GENERIC CARD STYLE --- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* --- WIDGET 1: FLIGHT PATH --- */
+        .flight-wrapper {
+            position: relative; width: 100%; height: 100px;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 10px;
+        }
         .flight-line {
             position: absolute; width: 70%; height: 2px;
             background: repeating-linear-gradient(to right, var(--accent-color) 0, var(--accent-color) 5px, transparent 5px, transparent 10px);
-            opacity: 0.5; top: 50%; left: 15%;
+            opacity: 0.5;
         }
-
         .beacon {
             position: absolute; top: 50%; transform: translate(-50%, -50%);
             display: flex; flex-direction: column; align-items: center; z-index: 5;
         }
-        
         .beacon-dot {
-            width: 20px; height: 20px; background: var(--accent-color);
-            border-radius: 50%; box-shadow: 0 0 20px var(--accent-color);
-            animation: pulse 2s infinite; position: relative;
+            width: 14px; height: 14px; background: var(--accent-color);
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent-color);
         }
-        
-        .beacon-dot::after {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); width: 40px; height: 40px;
-            border: 1px solid var(--accent-color); border-radius: 50%;
-            opacity: 0.5; animation: ripple 2s infinite;
-        }
-
         .beacon-label {
-            margin-top: 25px; font-size: 0.9rem; font-weight: bold;
-            color: var(--text-color); letter-spacing: 1px; text-transform: uppercase;
+            margin-top: 20px; font-size: 0.7rem; font-weight: bold;
+            color: var(--text-color); letter-spacing: 1px;
         }
-
         .beacon-left { left: 15%; }
         .beacon-right { left: 85%; }
-
         .plane-icon { 
-            font-size: 30px; position: absolute; left: 15%; top: 50%;
-            transform: translate(-50%, -50%) rotate(90deg); z-index: 10; 
-            transition: left 2.5s cubic-bezier(0.45, 0, 0.55, 1);
-            text-shadow: 0 0 10px white;
+            font-size: 24px; position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%) rotate(90deg);
         }
 
-        /* --- BUTTONS --- */
-        .cta-btn {
-            background: var(--accent-color); border: none; padding: 15px 40px;
-            color: white; font-size: 1.1rem; border-radius: 50px; cursor: pointer;
-            margin-top: 30px; font-weight: 600; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            font-family: 'Poppins', sans-serif;
+        /* --- WIDGET 2: TIME & COUNTER --- */
+        .time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
-        .cta-btn.outline { background: transparent; border: 1px solid var(--text-color); color: var(--text-color); box-shadow: none; }
-
-        /* --- CARDS & MODULES --- */
-        .card-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 400px; margin-top: 20px; }
-        .interactive-card {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            border: 1px solid var(--card-border); cursor: pointer; text-align: left;
-        }
-        .card-content { display: none; margin-top: 10px; color: var(--accent-color); font-weight: 600; font-size: 0.9rem; animation: fadeIn 0.5s; }
+        .clock-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
+        .clock-time { font-size: 1.2rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; }
         
-        .timeline { position: relative; max-width: 80%; margin: 40px auto; text-align: left; padding-left: 30px; border-left: 2px solid var(--accent-color); }
-        .event { margin-bottom: 40px; position: relative; }
-        .event::before {
-            content: '❤️'; position: absolute; left: -39px; top: 0;
-            background: var(--bg-color); padding: 5px 0; font-size: 0.8rem;
+        .counter-card { grid-column: span 2; } /* Full width */
+        .counter-num { font-size: 2rem; font-weight: bold; color: var(--accent-color); }
+        .counter-text { font-size: 0.8rem; opacity: 0.8; }
+
+        /* --- WIDGET 3: STATUS --- */
+        .status-badge {
+            display: inline-block;
+            background: rgba(255, 77, 109, 0.2);
+            color: var(--accent-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 5px;
         }
-        .date { font-size: 0.9rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
-        .counter-box { background: var(--card-bg); padding: 20px; border-radius: 20px; margin: 20px 0; border: 1px solid var(--card-border); }
-        .counter-number { font-size: 2.5rem; font-weight: bold; color: var(--accent-color); }
-
-        .drama-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 400px; }
-        .drama-card { background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--card-border); cursor: pointer; }
-        .drama-reveal { display: none; font-size: 0.8rem; color: var(--accent-color); margin-top: 5px; font-weight: bold; }
-
-        .emoji-row { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
-        .emoji-btn { font-size: 2rem; background: none; border: none; cursor: pointer; transition: transform 0.2s; }
-        .emoji-btn:hover { transform: scale(1.2); }
-        #emotion-text { min-height: 30px; color: var(--accent-color); font-weight: 600; }
-
-        #still-here-btn {
-            background: transparent; border: 2px solid var(--accent-color); color: var(--accent-color);
-            padding: 20px 40px; border-radius: 50px; font-size: 1.2rem; margin: 40px 0; cursor: pointer; width: 100%; max-width: 300px;
+        /* --- WIDGET 4: LOVE JAR --- */
+        .love-jar-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            transition: transform 0.1s;
         }
-        #still-here-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95);
-            z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center;
+        .love-jar-btn:active { transform: scale(0.95); }
+        #jar-content {
+            margin-top: 15px;
+            min-height: 40px;
+            font-style: italic;
+            color: var(--secondary-text);
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.5s;
         }
-        .still-text { font-size: 1.5rem; color: white; margin-bottom: 20px; opacity: 0; transform: translateY(20px); transition: all 1s; }
 
-        .apology-section { margin-top: 40px; width: 100%; max-width: 400px; text-align: left; }
-        .apology-header { font-size: 0.9rem; color: var(--secondary-text); cursor: pointer; text-decoration: underline; opacity: 0.7; }
-        .apology-content { display: none; margin-top: 15px; padding: 15px; background: rgba(255,0,0,0.05); border-left: 3px solid var(--accent-color); border-radius: 5px; }
-
-        #final-msg {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 3000; flex-direction: column; justify-content: center; align-items: center;
+        /* --- WIDGET 5: PULSE --- */
+        .pulse-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .big-heart { font-size: 100px; animation: heartbeat 1s infinite; }
+        .pulse-btn {
+            background: none; border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .pulse-anim { animation: heartbeat 0.6s infinite; }
 
-        .tap-zone { height: 50vh; width: 90%; border: 2px dashed var(--card-border); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background: rgba(255,255,255,0.02); }
-
-        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        /* ANIMATIONS */
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.2); } 100% { transform: translate(-50%, -50%) scale(1); } }
-        @keyframes ripple { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(2); opacity: 0; } }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
-    <button class="theme-toggle" onclick="toggleTheme()">☀️/🌙</button>
-
+    <button class="theme-toggle" onclick="document.body.classList.toggle('day-mode')">☀️</button>
     <div class="stars" id="star-container"></div>
 
-    <div id="screen-1" class="screen active">
-        <p class="small-text">Made with love for my Mummuu</p>
+    <header>
+        <h1>Mummuu's Dashboard</h1>
+        <div class="subtitle">A little piece of Bubu, always with you.</div>
+    </header>
+
+    <div class="dashboard">
         
-        <h1>Miles Apart...</h1>
-        <p>But my heart is always where you are.</p>
-        
-        <div class="flight-path-wrapper">
-            <div class="flight-line"></div>
-            <div class="beacon beacon-left">
-                <div class="beacon-dot"></div>
-                <div class="beacon-label">ALBIN</div>
-            </div>
-            <div class="beacon beacon-right">
-                <div class="beacon-dot"></div>
-                <div class="beacon-label">TAA</div>
-            </div>
-            <div class="plane-icon" id="plane">✈️</div>
-        </div>
-
-        <button class="cta-btn" onclick="flyPlane()">Close the Distance</button>
-    </div>
-
-    <div id="screen-2" class="screen hidden">
-        <h1>Happy New Year!</h1>
-        <p>Tap the sky below for my Cinta.</p>
-        
-        <div class="tap-zone" onclick="launchFireworks(event)">
-            <span style="opacity: 0.5;">(Tap Here Repeatedly!)</span>
-        </div>
-
-        <button class="cta-btn outline" onclick="goToScreen(3)">Our Story ↓</button>
-    </div>
-
-    <div id="screen-3" class="screen hidden">
-        <h1>Us</h1>
-        
-        <div class="timeline">
-            <div class="event">
-                <div class="date">Oct 21, 2025</div>
-                <div class="memory">The day I first found you.</div>
-            </div>
-            <div class="event">
-                <div class="date">NOVEMBER</div>
-                <div class="memory">Sneaking calls while your sister was away 🤫</div>
-            </div>
-            <div class="event">
-                <div class="date">December</div>
-                <div class="memory">Surviving the exams and stress together.</div>
-            </div>
-            <div class="event">
-                <div class="date">Right Now</div>
-                <div class="memory">Falling asleep to the sound of your breathing.</div>
+        <div class="card">
+            <div class="clock-label" style="text-align: center;">OUR CONNECTION</div>
+            <div class="flight-wrapper">
+                <div class="flight-line"></div>
+                <div class="beacon beacon-left">
+                    <div class="beacon-dot"></div>
+                    <div class="beacon-label">ALBIN</div>
+                </div>
+                <div class="beacon beacon-right">
+                    <div class="beacon-dot"></div>
+                    <div class="beacon-label">TAA</div>
+                </div>
+                <div class="plane-icon">✈️</div>
             </div>
         </div>
 
-        <button class="cta-btn" onclick="goToScreen(4)">The Real Us ↓</button>
-    </div>
-
-    <div id="screen-4" class="screen hidden" style="justify-content: flex-start;">
-        
-        <div class="counter-box">
-            <p>Days since Hi</p>
-            <div class="counter-number" id="days-counter">0</div>
-            <p class="small-text">And I love you more every day.</p>
-        </div>
-
-        <h2>Songs for my Muthe</h2>
-        <div class="card-grid">
-            <div class="interactive-card" onclick="toggleCard(this)">
-                <div>🎶 <span style="font-weight:600;">Perfect - Ed Sheeran</span></div>
-                <div class="card-content">Because you look perfect tonight, and every night.</div>
+        <div class="time-row">
+            <div class="card">
+                <div class="clock-label">INDIA (BUBU)</div>
+                <div class="clock-time" id="time-india">--:--</div>
             </div>
-            <div class="interactive-card" onclick="toggleCard(this)">
-                <div>🎶 <span style="font-weight:600;">Until I Found You</span></div>
-                <div class="card-content">I was lost before my Sayang showed up.</div>
+            <div class="card">
+                <div class="clock-label">INDO (SAYANG)</div>
+                <div class="clock-time" id="time-indo">--:--</div>
             </div>
-            <div class="interactive-card" onclick="toggleCard(this)">
-                <div>🎶 <span style="font-weight:600;">About You - The 1975</span></div>
-                <div class="card-content">This plays in my head when I'm missing you.</div>
+            <div class="card counter-card">
+                <div class="counter-num" id="days-count">0</div>
+                <div class="counter-text">Days since we found each other ❤️</div>
             </div>
         </div>
 
-        <h2>Drama Queen Moments 👑</h2>
-        <div class="drama-grid">
-            <div class="drama-card" onclick="revealDrama(this)">
-                <div>When you overthink 💭</div>
-                <div class="drama-reveal">I still choose you, always.</div>
+        <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="text-align: left;">
+                <div style="font-weight: bold; font-size: 0.9rem;">Bubu's Current Status:</div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">Updated: Forever</div>
             </div>
-            <div class="drama-card" onclick="revealDrama(this)">
-                <div>When you get mad 😠</div>
-                <div class="drama-reveal">You're cute when you're mad.</div>
-            </div>
-            <div class="drama-card" onclick="revealDrama(this)">
-                <div>When you cry 😢</div>
-                <div class="drama-reveal">I'm here to hold you.</div>
-            </div>
-            <div class="drama-card" onclick="revealDrama(this)">
-                <div>When you're quiet 🤫</div>
-                <div class="drama-reveal">I'll wait for you, Bubu is here.</div>
-            </div>
+            <div class="status-badge">Missing You</div>
         </div>
 
-        <div style="margin-top: 30px; width: 100%;">
-            <p>No matter how you feel...</p>
-            <div class="emoji-row">
-                <button class="emoji-btn" onclick="showEmo(this)">😄</button>
-                <button class="emoji-btn" onclick="showEmo(this)">😠</button>
-                <button class="emoji-btn" onclick="showEmo(this)">😢</button>
-                <button class="emoji-btn" onclick="showEmo(this)">😌</button>
-            </div>
-            <div id="emotion-text"></div>
+        <div class="card">
+            <button class="love-jar-btn" onclick="openJar()">🍯 I need a smile</button>
+            <div id="jar-content"></div>
         </div>
 
-        <button class="cta-btn" onclick="goToScreen(5)">One Last Thing ↓</button>
-    </div>
-
-    <div id="screen-5" class="screen hidden">
-        <button id="still-here-btn" onclick="triggerStillHere()">Are you still here?</button>
-    </div>
-
-    <div id="screen-6" class="screen hidden">
-        <h1>2026 Goals</h1>
-        <p>Bubu's promises to you.</p>
-
-        <div class="card-grid" style="margin-bottom:20px;">
-            <div class="interactive-card" onclick="toggleCard(this)">
-                <div style="font-weight:bold;">💌 Promise #1</div>
-                <div class="card-content">To always listen, even when I'm tired.</div>
+        <div class="card pulse-container">
+            <div style="text-align: left;">
+                <div style="font-weight: bold;">Virtual Touch</div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">Press the heart to feel me.</div>
             </div>
-            <div class="interactive-card" onclick="toggleCard(this)">
-                <div style="font-weight:bold;">🎓 Promise #2</div>
-                <div class="card-content">To work hard in our studies so I can take care of you properly one day.</div>
-            </div>
-            <div class="interactive-card" onclick="toggleCard(this)">
-                <div style="font-weight:bold;">❤️ Promise #3</div>
-                <div class="card-content">To love you more than I did in 2025.</div>
-            </div>
+            <button class="pulse-btn" id="pulseBtn" onclick="triggerPulse()">❤️</button>
         </div>
 
-        <div class="apology-section">
-            <div class="apology-header" onclick="toggleApology()">One quiet thing I want you to know...</div>
-            <div class="apology-content" id="apology-text">
-                I know I'm not perfect. I know distance is hard. But I'm still learning, and I'm so grateful my Sayang is staying while I do.
-            </div>
-        </div>
-
-        <div id="typewriter" style="min-height:50px; margin-top:30px; color:var(--accent-color); font-family:'Courier New'; font-weight:bold;"></div>
-
-        <button class="cta-btn" onclick="showFinalLove()" style="margin-top:30px;">
-            Say it back 💌
-        </button>
-    </div>
-
-    <div id="still-here-overlay" onclick="closeStillHere()">
-        <div class="still-text">Yes.</div>
-        <div class="still-text" style="transition-delay: 1s">After the silence.</div>
-        <div class="still-text" style="transition-delay: 2s">After the sleep calls.</div>
-        <div class="still-text" style="transition-delay: 3s">After everything.</div>
-        <div class="still-text" style="color:var(--accent-color); font-weight:bold; font-size: 2rem; margin-top: 30px; transition-delay: 4s">Bubu is still here.</div>
-        <div style="color:white; opacity:0.5; margin-top:50px; font-size:0.8rem;">(Tap to continue)</div>
-    </div>
-
-    <div id="final-msg">
-        <div class="big-heart">❤️</div>
-        <h1 style="font-size: 2rem; margin-top:20px;">I knew you would.</h1>
-        <p>I love you more, Mummuu.</p>
-        <p style="font-size:0.8rem; margin-top:20px; opacity:0.5;">Happy New Year 2026</p>
     </div>
 
     <script>
-        // THEME
-        function toggleTheme() { document.body.classList.toggle('day-mode'); }
-
-        // STARS
+        // --- STARS ---
         const starsContainer = document.getElementById('star-container');
         for(let i=0; i<50; i++) {
             let star = document.createElement('div');
@@ -372,86 +263,61 @@
             starsContainer.appendChild(star);
         }
 
-        // NAV
-        function goToScreen(num) {
-            document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
-            const target = document.getElementById('screen-' + num);
-            target.style.display = 'flex';
-            setTimeout(() => { target.classList.add('active'); }, 10);
-            if(num === 6) startTypewriter();
-        }
-
-        // FLIGHT ANIMATION (NO MUSIC)
-        function flyPlane() {
-            const plane = document.getElementById('plane');
-            plane.style.left = '85%'; 
+        // --- CLOCKS (Live) ---
+        function updateClocks() {
+            const now = new Date();
             
-            setTimeout(() => {
-                document.getElementById('screen-1').classList.remove('active');
-                document.getElementById('screen-1').style.display = 'none';
-                goToScreen(2);
-                autoFireworks(); 
-            }, 2500); 
-        }
+            // India (UTC +5:30)
+            const optionsIndia = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false };
+            document.getElementById('time-india').innerText = now.toLocaleTimeString('en-US', optionsIndia);
 
-        // FIREWORKS
-        function launchFireworks(e) {
-            const globalX = e.clientX / window.innerWidth;
-            const globalY = e.clientY / window.innerHeight;
-            const isDay = document.body.classList.contains('day-mode');
-            const colors = isDay ? ['#d84315', '#5d4037', '#ffeb3b'] : ['#ff0000', '#ffa500', '#ffffff'];
-            confetti({ particleCount: 80, spread: 100, origin: { x: globalX, y: globalY }, colors: colors, startVelocity: 30, gravity: 0.6, ticks: 60 });
+            // Indonesia (Western/Jakarta UTC +7:00)
+            const optionsIndo = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false };
+            document.getElementById('time-indo').innerText = now.toLocaleTimeString('en-US', optionsIndo);
         }
-        function autoFireworks() { confetti({ particleCount: 150, spread: 120, origin: { y: 0.6 }, startVelocity: 40, colors: ['#ff4d6d', '#fff'] }); }
+        setInterval(updateClocks, 1000);
+        updateClocks();
 
-        // DATE (Oct 21, 2025)
-        const startDate = new Date("2025-10-21"); 
+        // --- COUNTER ---
+        const startDate = new Date("2025-10-21");
         const today = new Date();
         const diffDays = Math.ceil(Math.abs(today - startDate) / (1000 * 60 * 60 * 24)); 
-        document.getElementById('days-counter').innerText = diffDays;
+        document.getElementById('days-count').innerText = diffDays;
 
-        // CARDS
-        function toggleCard(card) {
-            const content = card.querySelector('.card-content');
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        }
-        function revealDrama(card) {
-            const content = card.querySelector('.drama-reveal');
-            content.style.display = 'block'; card.style.background = 'var(--bg-color)';
-        }
-        function showEmo(btn) {
-            const text = document.getElementById('emotion-text');
-            text.style.opacity = 0;
-            setTimeout(() => { text.innerText = "Bubu loves you here too."; text.style.opacity = 1; }, 300);
-        }
-        function toggleApology() {
-            const content = document.getElementById('apology-text');
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        }
+        // --- LOVE JAR MESSAGES ---
+        const messages = [
+            "You are my favorite notification. 📱",
+            "Drink some water, my Sayang! 💧",
+            "Bubu is thinking of you right now. 💭",
+            "You look beautiful today (I just know it). ✨",
+            "I'm so proud of how hard you study. 📚",
+            "Just a reminder: I love you more. ❤️",
+            "Distance means nothing when you mean everything. 🌍",
+            "Sending you a giant virtual hug! 🤗",
+            "You are the best thing that happened in 2025. 🌟",
+            "Keep smiling, Muthe. It's my favorite view.",
+            "I am working hard so we can meet soon. 💼",
+            "Everything is going to be okay. Bubu is here."
+        ];
 
-        // STILL HERE
-        function triggerStillHere() {
-            const overlay = document.getElementById('still-here-overlay');
-            overlay.style.display = 'flex';
-            const lines = document.querySelectorAll('.still-text');
-            lines.forEach((line, index) => { setTimeout(() => { line.style.opacity = 1; line.style.transform = 'translateY(0)'; }, index * 1000); });
-        }
-        function closeStillHere() { document.getElementById('still-here-overlay').style.display = 'none'; goToScreen(6); }
-
-        // TYPEWRITER
-        const textToType = "Jarak hanyalah ujian (Distance is just a test). I love you.";
-        let i = 0;
-        function startTypewriter() {
-            const el = document.getElementById("typewriter");
-            if(el.innerHTML === "") {
-                const interval = setInterval(() => { el.innerHTML += textToType.charAt(i); i++; if(i >= textToType.length) clearInterval(interval); }, 50);
-            }
+        function openJar() {
+            const display = document.getElementById('jar-content');
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            display.style.display = 'block';
+            display.innerText = '"' + randomMsg + '"';
         }
 
-        // FINAL
-        function showFinalLove() {
-            document.getElementById('final-msg').style.display = 'flex';
-            setInterval(() => { confetti({ particleCount: 50, spread: 160, origin: { x: Math.random(), y: Math.random() - 0.2 }, colors: ['#ff4d6d', '#ffffff'], startVelocity: 30, ticks: 50 }); }, 800);
+        // --- PULSE ---
+        function triggerPulse() {
+            const btn = document.getElementById('pulseBtn');
+            btn.classList.add('pulse-anim');
+            
+            // Vibrate phone if supported
+            if (navigator.vibrate) navigator.vibrate([200]);
+
+            setTimeout(() => {
+                btn.classList.remove('pulse-anim');
+            }, 1000);
         }
     </script>
 </body>
