@@ -11,7 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         /* --- VARIABLES --- */
         :root {
@@ -35,17 +37,18 @@
             padding-bottom: 50px;
         }
 
-        /* --- BACKGROUND STARS --- */
+        /* --- STARS --- */
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
 
         /* --- HEADER --- */
-        header { text-align: center; padding: 40px 20px 10px; }
+        header { text-align: center; padding: 40px 20px 20px; }
         h1 { 
-            font-family: 'Dancing Script', cursive; font-size: 2.5rem; 
-            color: var(--accent-color); text-shadow: 0 0 10px var(--glow-color);
+            font-family: 'Dancing Script', cursive; font-size: 2.8rem; 
+            color: var(--accent-color); text-shadow: 0 0 15px var(--glow-color);
+            margin-bottom: 5px;
         }
-        .subtitle { font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
+        .subtitle { font-size: 0.8rem; opacity: 0.7; letter-spacing: 2px; text-transform: uppercase; }
 
         /* --- DASHBOARD --- */
         .dashboard {
@@ -55,17 +58,18 @@
         .card {
             background: var(--card-bg); 
             border: 1px solid var(--card-border);
-            border-radius: 20px; padding: 20px; 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px; padding: 20px; 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             text-align: center; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
             position: relative; overflow: hidden;
+            transition: transform 0.2s;
         }
 
-        /* --- 1. LANTERNS ON WATER (Connection) --- */
-        .lantern-card { height: 160px; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 0; }
-        .names-row {
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; z-index: 2; padding: 0 10px;
+        /* --- 1. LANTERN CONNECTION --- */
+        .lantern-card { height: 160px; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 0; padding-top: 30px;}
+        .lantern-text {
+            font-family: 'Dancing Script', cursive; font-size: 1.4rem; color: #ffe0b2;
+            text-shadow: 0 0 10px rgba(255, 224, 178, 0.5); z-index: 2;
         }
         .water-surface {
             width: 100%; height: 60px;
@@ -75,94 +79,95 @@
             overflow: hidden;
         }
         .lantern {
-            position: absolute; bottom: 10px; width: 15px; height: 20px;
-            background: var(--lantern-color); border-radius: 3px;
-            box-shadow: 0 0 10px var(--lantern-color);
+            position: absolute; bottom: -20px; width: 18px; height: 24px;
+            background: var(--lantern-color); border-radius: 4px;
+            box-shadow: 0 0 15px var(--lantern-color);
             animation: floatLantern 8s linear infinite;
-            opacity: 0.8;
+            opacity: 0.9;
         }
-        .lantern::after { /* Reflection */
-            content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 100%;
-            background: var(--lantern-color); opacity: 0.3; transform: scaleY(-0.5); filter: blur(3px);
-        }
+        .lantern::after { content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 100%; background: var(--lantern-color); opacity: 0.4; transform: scaleY(-0.6); filter: blur(4px); }
 
-        /* --- 2. TIME --- */
-        .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .clock-time { font-size: 1.4rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; text-shadow: 0 0 10px var(--glow-color); }
-        .clock-label { font-size: 0.65rem; opacity: 0.7; letter-spacing: 1px; }
-
-        /* --- 3. WEATHER HUG CAT --- */
-        .cat-card { min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .cat-question { 
-            font-size: 1.1rem; font-family: 'Dancing Script', cursive; margin-bottom: 10px; color: var(--accent-color); z-index: 5;
+        /* --- 2. DUAL WEATHER WINDOWS --- */
+        .weather-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .weather-window {
+            background: rgba(0,0,0,0.2); border-radius: 18px; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+            border: 1px solid rgba(255,255,255,0.05); min-height: 160px; justify-content: center;
         }
-        .weather-status { font-size: 0.7rem; opacity: 0.5; margin-bottom: 5px; z-index: 5; }
+        .weather-cat-img { 
+            width: 110px; height: 110px; object-fit: contain; 
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); 
+            z-index: 2; transition: opacity 0.5s; 
+        }
+        .weather-info { font-size: 0.75rem; margin-top: 5px; opacity: 0.8; z-index: 2; font-weight: 600; }
+        .weather-label { font-size: 0.6rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; letter-spacing: 1px; }
+
+        /* Weather FX */
+        .fx-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 18px; pointer-events: none; }
+        .rain-drop { position: absolute; width: 2px; height: 10px; background: rgba(135, 206, 235, 0.5); animation: rain 0.8s linear infinite; }
+        .sun-ray { position: absolute; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,200,0,0.1), transparent 60%); top: -50%; left: -50%; animation: spin 10s linear infinite; }
         
-        /* Weather Layers */
-        .weather-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        
-        /* Rain */
-        .rain-drop {
-            position: absolute; width: 2px; height: 10px; background: rgba(173, 216, 230, 0.6);
-            top: -10px; animation: rainFall 1s linear infinite;
-        }
-        /* Sun */
-        .sun-glow {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%);
-            animation: pulseSun 4s infinite;
-        }
+        /* --- 3. AFFIRMATION CAT (LOTTIE) --- */
+        .affirmation-card { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .affirmation-text { font-family: 'Dancing Script', cursive; font-size: 1.6rem; color: var(--accent-color); margin-top: 10px; }
 
-        /* --- 4. LIQUID HEART (Miss You Meter) --- */
-        .meter-card { display: flex; align-items: center; justify-content: space-between; padding: 25px; cursor: pointer; }
-        .liquid-heart-container {
-            width: 60px; height: 50px; position: relative;
-        }
-        .heart-shape {
-            width: 100%; height: 100%; background: rgba(255,255,255,0.1);
-            clip-path: path("M30,48 C-15,30 -10,-5 15,5 C20,8 25,15 30,20 C35,15 40,8 45,5 C70,-5 75,30 30,48 Z");
-            position: relative; overflow: hidden;
-        }
-        .liquid-fill {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; /* Dynamic */
-            background: var(--accent-color); transition: height 0.5s;
-            box-shadow: 0 0 15px var(--accent-color);
-        }
-
-        /* --- 5. MESSAGE IN A BOTTLE --- */
-        .bottle-card { min-height: 200px; display: flex; flex-direction: column; }
-        .sand-dune {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: #e6cca5; opacity: 0.1;
-            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-            z-index: 0;
-        }
-        .bottle-icon { font-size: 2rem; z-index: 2; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); animation: floatBottle 3s ease-in-out infinite;}
+        /* --- 4. OVERFLOWING HEART --- */
+        .meter-card { padding: 30px; cursor: pointer; }
+        .meter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .meter-title { font-weight: bold; font-size: 1rem; }
+        .meter-count { font-size: 0.8rem; opacity: 0.7; font-family: monospace; }
         
-        .message-display {
-            font-size: 0.9rem; font-style: italic; opacity: 0.8; min-height: 60px; 
-            display: flex; align-items: center; justify-content: center; z-index: 2;
+        .heart-container {
+            width: 100px; height: 90px; margin: 0 auto; position: relative;
+            filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.4));
         }
-        .input-row { display: flex; gap: 10px; z-index: 2; margin-top: auto; }
+        .heart-bg { fill: rgba(255,255,255,0.1); }
+        .heart-liquid { fill: var(--accent-color); transition: y 0.5s ease; }
+
+        /* --- 5. BOTTLE --- */
+        .bottle-card { min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 0; overflow: visible;}
+        .sand-bg {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+            background: linear-gradient(to top, #d4a373 0%, #fae1dd 100%);
+            border-radius: 0 0 24px 24px; opacity: 0.8; z-index: 0;
+        }
+        .bottle-visual { 
+            font-size: 4rem; margin: 0 auto 10px; z-index: 2; 
+            transform: rotate(-10deg) translateY(10px); 
+            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.3));
+            transition: transform 0.5s;
+        }
+        .bottle-visual.sent { transform: rotate(10deg) translateY(-50px) scale(0.8); opacity: 0; }
+        
+        .message-input-area { z-index: 5; margin-bottom: 20px; display: flex; gap: 10px; width: 100%; }
         .glass-input {
-            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
-            padding: 8px 15px; border-radius: 50px; color: white; outline: none; font-size: 0.8rem;
+            flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 15px; border-radius: 50px; color: white; outline: none; font-size: 0.9rem;
         }
         .glass-btn {
-            background: var(--accent-color); border: none; width: 35px; height: 35px;
+            background: var(--accent-color); border: none; width: 40px; height: 40px;
             border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 10px var(--accent-color);
         }
 
-        /* --- ANIMATIONS --- */
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        @keyframes floatLantern { 
-            0% { transform: translate(0, 0) scale(0.8); opacity: 0; } 
-            10% { opacity: 1; }
-            100% { transform: translate(300px, -20px) scale(1); opacity: 0; } 
+        /* --- 6. TOUCH BUTTON --- */
+        .touch-container { display: flex; align-items: center; justify-content: space-between; }
+        .touch-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: none;
+            background: rgba(255, 77, 109, 0.1); border: 2px solid var(--accent-color);
+            color: var(--accent-color); font-size: 1.5rem; cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 77, 109, 0.2); position: relative; overflow: hidden;
         }
-        @keyframes rainFall { to { transform: translateY(220px); } }
-        @keyframes pulseSun { 0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } }
-        @keyframes floatBottle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+        .touch-btn:active { transform: scale(0.95); background: var(--accent-color); color: white; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes floatLantern { 0% { transform: translate(0, 20px) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(100px, -100px) scale(1); opacity: 0; } }
+        @keyframes rain { to { transform: translateY(150px); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        
+        .heart-particle { position: fixed; bottom: -50px; font-size: 24px; animation: floatUp 3s linear forwards; z-index: 999; pointer-events: none; }
+        @keyframes floatUp { to { transform: translateY(-110vh) scale(1.2); opacity: 0; } }
 
     </style>
 </head>
@@ -172,72 +177,82 @@
 
     <header>
         <h1>Mummuu's Dashboard</h1>
-        <div class="subtitle">Beta 3.0 • Lantern Night</div>
+        <div class="subtitle">Beta 4.0 • Deep Love</div>
     </header>
 
     <div class="dashboard">
 
         <div class="card lantern-card">
-            <div style="font-size: 0.7rem; opacity: 0.5; margin-top: 20px;">LANTERN LINK ACTIVE</div>
-            <div class="names-row">
-                <div>BUBU</div>
-                <div>MUMU</div>
-            </div>
-            <div class="water-surface" id="lantern-container">
-                </div>
+            <div class="lantern-text">"My love always finds its way home."</div>
+            <div class="water-surface" id="lantern-container"></div>
         </div>
 
-        <div class="time-row">
-            <div class="card">
-                <div class="clock-label">INDIA (BUBU)</div>
-                <div class="clock-time" id="time-india">--:--</div>
+        <div class="weather-row">
+            <div class="weather-window">
+                <div class="weather-label">BUBU (INDIA)</div>
+                <div class="fx-layer" id="fx-india"></div>
+                <img src="grey-cloud.webp" class="weather-cat-img" id="img-india">
+                <div class="weather-info" id="info-india">Loading...</div>
             </div>
-            <div class="card">
-                <div class="clock-label">SUMATERA (MUMU)</div>
-                <div class="clock-time" id="time-indo">--:--</div>
+            <div class="weather-window">
+                <div class="weather-label">SAYANG (INDO)</div>
+                <div class="fx-layer" id="fx-indo"></div>
+                <img src="white-cloud.webp" class="weather-cat-img" id="img-indo">
+                <div class="weather-info" id="info-indo">Loading...</div>
             </div>
         </div>
 
-        <div class="card cat-card">
-            <div class="weather-status" id="weather-text">Checking Weather in Sumatera...</div>
-            <div class="cat-question">"Does Bubu love you?"</div>
-            
-            <div class="weather-layer" id="weather-layer"></div>
-
+        <div class="card affirmation-card">
             <lottie-player 
-                src="cat.json" background="transparent" speed="1"  
-                style="width: 150px; height: 150px; z-index: 2;" loop autoplay>
+                src="cat.json" 
+                background="transparent" 
+                speed="1"  
+                style="width: 150px; height: 150px;" 
+                loop autoplay>
             </lottie-player>
+            <div class="affirmation-text">Does Bubu love you?</div>
         </div>
 
         <div class="card meter-card" id="missYouBtn">
-            <div style="text-align: left;">
-                <div style="font-weight: bold; font-size: 1rem;">Miss You Meter</div>
-                <div style="font-size: 0.7rem; opacity: 0.6;" id="miss-text">Loading clicks...</div>
+            <div class="meter-header">
+                <div class="meter-title">Miss You Meter</div>
+                <div class="meter-count" id="miss-total">Total: 0</div>
             </div>
-            <div class="liquid-heart-container">
-                <div class="heart-shape">
-                    <div class="liquid-fill" id="liquid-fill"></div>
-                </div>
+            
+            <div class="heart-container">
+                <svg viewBox="0 0 100 90" width="100" height="90">
+                    <defs>
+                        <mask id="heartMask">
+                            <path d="M50,88 C10,65 0,35 0,22 C0,10 10,0 25,0 C38,0 45,10 50,18 C55,10 62,0 75,0 C90,0 100,10 100,22 C100,35 90,65 50,88 Z" fill="white"/>
+                        </mask>
+                    </defs>
+                    <rect x="0" y="0" width="100" height="90" class="heart-bg" mask="url(#heartMask)" />
+                    <rect x="0" y="90" width="100" height="90" class="heart-liquid" id="liquid-bar" mask="url(#heartMask)" />
+                </svg>
             </div>
+            <div style="font-size: 0.7rem; opacity: 0.5; margin-top: 10px;">Tap to fill Bubu's heart</div>
         </div>
 
         <div class="card bottle-card">
-            <div class="clock-label" style="margin-bottom: 10px;">MESSAGE IN A BOTTLE</div>
-            <div class="bottle-icon">🍾</div>
-            <div class="message-display" id="bottle-msg">
-                Waiting for tide...
+            <div class="bottle-visual" id="bottle-visual">🍾</div> 
+            <div class="sand-bg"></div>
+            
+            <div style="font-size: 0.9rem; font-style: italic; opacity: 0.8; margin-bottom: 15px; z-index: 2;" id="last-bottle-msg">
+                "Checking the tides..."
             </div>
-            <div class="sand-dune"></div>
-            <div class="input-row">
-                <input type="text" id="bottleInput" class="glass-input" placeholder="Write a note..." maxlength="50">
+
+            <div class="message-input-area">
+                <input type="text" id="bottleInput" class="glass-input" placeholder="Write a secret note..." maxlength="50">
                 <button class="glass-btn" id="sendBottleBtn">➤</button>
             </div>
         </div>
 
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 15px;">
-            <div style="font-size: 0.8rem; opacity: 0.7;">Send a vibrating pulse ❤️</div>
-            <button class="glass-btn" id="pulseBtn" style="width: 40px; height: 40px;">⚡</button>
+        <div class="card touch-container">
+            <div style="text-align: left;">
+                <div style="font-weight: bold;">Virtual Touch</div>
+                <div style="font-size: 0.7rem; opacity: 0.6;">Hold to send a river of love</div>
+            </div>
+            <button class="touch-btn" id="touchBtn">❤️</button>
         </div>
 
     </div>
@@ -260,38 +275,71 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- 1. MISS YOU METER ---
+        // --- 1. OVERFLOWING HEART ---
         const missBtn = document.getElementById('missYouBtn');
-        const liquid = document.getElementById('liquid-fill');
-        const missText = document.getElementById('miss-text');
+        const liquidBar = document.getElementById('liquid-bar');
+        const missTotal = document.getElementById('miss-total');
+        let localClickCount = 0;
 
-        // Listen
         onValue(ref(db, 'missYou/count'), (snapshot) => {
-            const count = snapshot.val() || 0;
-            missText.innerText = `Missed ${count} times today`;
-            // Fill logic: Max out at 100 clicks visually, but count keeps going
-            let percentage = Math.min(count, 100); 
-            liquid.style.height = percentage + "%";
+            const total = snapshot.val() || 0;
+            missTotal.innerText = `Total Misses: ${total}`;
         });
 
-        // Click
         missBtn.addEventListener('click', () => {
             runTransaction(ref(db, 'missYou/count'), (count) => (count || 0) + 1);
-            if(navigator.vibrate) navigator.vibrate(50);
+            
+            localClickCount += 10;
+            if (localClickCount > 100) {
+                confetti({
+                    particleCount: 150, spread: 80, origin: { y: 0.6 },
+                    colors: ['#ff4d6d', '#ffffff']
+                });
+                localClickCount = 0;
+            }
+            
+            const yValue = 90 - (90 * (localClickCount / 100));
+            liquidBar.setAttribute('y', yValue);
         });
 
-        // --- 2. MESSAGE IN A BOTTLE ---
+        // --- 2. TOUCH BUTTON ---
+        const touchBtn = document.getElementById('touchBtn');
+        let touchInterval;
+
+        const startRiver = () => {
+            set(ref(db, 'heartbeats/lastPulse'), Date.now());
+            touchInterval = setInterval(() => {
+                set(ref(db, 'heartbeats/lastPulse'), Date.now());
+            }, 300);
+        };
+        const stopRiver = () => { clearInterval(touchInterval); };
+
+        touchBtn.addEventListener('mousedown', startRiver);
+        touchBtn.addEventListener('mouseup', stopRiver);
+        touchBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startRiver(); });
+        touchBtn.addEventListener('touchend', stopRiver);
+
+        onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
+            if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
+                createHeartRain();
+            }
+        });
+
+        // --- 3. BOTTLE ---
         const bInput = document.getElementById('bottleInput');
         const bBtn = document.getElementById('sendBottleBtn');
-        const bDisplay = document.getElementById('bottle-msg');
+        const bDisplay = document.getElementById('last-bottle-msg');
+        const bVisual = document.getElementById('bottle-visual');
 
         bBtn.addEventListener('click', () => {
             if(bInput.value.trim()) {
                 push(ref(db, 'bottles'), { text: bInput.value, time: Date.now() });
                 bInput.value = "";
+                bVisual.classList.add('sent');
+                setTimeout(() => bVisual.classList.remove('sent'), 1000);
             }
         });
-
+        
         const bottleQuery = query(ref(db, 'bottles'), limitToLast(1));
         onValue(bottleQuery, (snapshot) => {
             if(snapshot.exists()) {
@@ -301,35 +349,31 @@
             }
         });
 
-        // --- 3. PULSE ---
-        const pulseBtn = document.getElementById("pulseBtn");
-        pulseBtn.addEventListener("click", () => {
-            set(ref(db, 'heartbeats/lastPulse'), Date.now());
-        });
-        onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
-            if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        function createHeartRain() {
+            for (let i = 0; i < 5; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart-particle');
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + "vw";
+                heart.style.animationDuration = (Math.random() * 1 + 2) + "s";
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 3000);
             }
-        });
-
+        }
     </script>
 
     <script>
-        // LANTERNS GENERATOR
+        // LANTERNS
         const lanternContainer = document.getElementById('lantern-container');
         function spawnLantern() {
             const l = document.createElement('div');
             l.className = 'lantern';
-            l.style.left = "-20px"; // Start off screen
-            // Randomize slightly
-            l.style.bottom = (Math.random() * 20 + 5) + "px";
-            l.style.animationDuration = (Math.random() * 3 + 6) + "s"; // 6-9s speed
+            l.style.left = (Math.random() * 80) + "%"; 
+            l.style.animationDuration = (Math.random() * 3 + 6) + "s";
             lanternContainer.appendChild(l);
-            
-            // Cleanup
-            setTimeout(() => { l.remove(); }, 9000);
+            setTimeout(() => l.remove(), 9000);
         }
-        setInterval(spawnLantern, 2000); // New lantern every 2s
+        setInterval(spawnLantern, 1500);
 
         // STARS
         const starsContainer = document.getElementById('star-container');
@@ -344,52 +388,58 @@
             starsContainer.appendChild(star);
         }
 
-        // TIME
-        function updateClocks() {
-            const now = new Date();
-            document.getElementById('time-india').innerText = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false });
-            document.getElementById('time-indo').innerText = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false });
-        }
-        setInterval(updateClocks, 1000);
-        updateClocks();
-
-        // WEATHER API (Sumatera Utara - Medan Coords: 3.59, 98.67)
-        async function checkWeather() {
+        // --- DUAL WEATHER ENGINE ---
+        async function fetchWeather(lat, lon, imgId, infoId, fxId, isNightTime, catColor) {
             try {
-                const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=3.59&longitude=98.67&current_weather=true');
-                const data = await response.json();
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const data = await res.json();
                 const code = data.current_weather.weathercode;
+                const temp = data.current_weather.temperature;
                 
-                const weatherLayer = document.getElementById('weather-layer');
-                const statusText = document.getElementById('weather-text');
-                weatherLayer.innerHTML = ""; // Clear old weather
+                const imgEl = document.getElementById(imgId);
+                const infoEl = document.getElementById(infoId);
+                const fxEl = document.getElementById(fxId);
+                
+                infoEl.innerText = `${temp}°C`;
+                fxEl.innerHTML = ""; // Clear FX
 
-                // WMO Weather Codes: 
-                // 0 = Clear, 1-3 = Cloudy, 50-69 = Rain, 95+ = Thunder
+                // LOGIC: Swap sticker based on code and Cat Color (grey/white)
                 if (code <= 1) {
-                    statusText.innerText = "It's Sunny in Sumatera ☀️";
-                    weatherLayer.innerHTML = '<div class="sun-glow"></div>';
+                    if (isNightTime) {
+                        imgEl.src = `${catColor}-night.webp`;
+                    } else {
+                        imgEl.src = `${catColor}-sun.webp`;
+                        fxEl.innerHTML = '<div class="sun-ray"></div>';
+                    }
                 } else if (code <= 3) {
-                    statusText.innerText = "It's Cloudy in Sumatera ☁️";
-                    // Could add cloud css here
+                    imgEl.src = `${catColor}-cloud.webp`;
                 } else if (code >= 50) {
-                    statusText.innerText = "It's Raining in Sumatera ☔";
-                    // Add 20 rain drops
-                    for(let i=0; i<20; i++) {
-                        let drop = document.createElement('div');
-                        drop.className = 'rain-drop';
-                        drop.style.left = Math.random()*100 + "%";
-                        drop.style.animationDuration = (Math.random()*0.5 + 0.5) + "s";
-                        drop.style.animationDelay = Math.random() + "s";
-                        weatherLayer.appendChild(drop);
+                    imgEl.src = `${catColor}-rain.webp`;
+                    for(let i=0; i<10; i++) {
+                        let d = document.createElement('div'); d.className='rain-drop';
+                        d.style.left = Math.random()*100+"%"; d.style.animationDelay=Math.random()+'s';
+                        fxEl.appendChild(d);
                     }
                 }
-            } catch (e) {
-                console.log("Weather failed");
-            }
+            } catch(e) { console.log("Weather error"); }
         }
-        checkWeather(); // Run on load
-        setInterval(checkWeather, 600000); // Refresh every 10 mins
+
+        function updateAllWeather() {
+            const indiaHour = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata", hour: 'numeric', hour12: false});
+            const indoHour = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta", hour: 'numeric', hour12: false});
+            
+            const indiaNight = indiaHour >= 18 || indiaHour < 6;
+            const indoNight = indoHour >= 18 || indoHour < 6;
+
+            // Fetch India (Grey Cat)
+            fetchWeather(10.52, 76.21, 'img-india', 'info-india', 'fx-india', indiaNight, 'grey');
+            
+            // Fetch Indo (White Cat)
+            fetchWeather(3.59, 98.67, 'img-indo', 'info-indo', 'fx-indo', indoNight, 'white');
+        }
+        
+        updateAllWeather();
+        setInterval(updateAllWeather, 600000); // 10 mins
 
     </script>
 </body>
