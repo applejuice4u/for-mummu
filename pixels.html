@@ -2,91 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Our Year in Pixels</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 1. ATMOSPHERE ENGINE (Time-based Themes) --- */
+        /* --- 1. ATMOSPHERE ENGINE --- */
         :root {
             /* Default: Night */
             --bg-gradient: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
             --text-color: white;
-            --grid-bg: rgba(255,255,255,0.1);
             
             /* RATING COLORS */
-            --c-best: #ff4d6d;   /* Neon Pink/Red */
+            --c-best: #ff4d6d;   /* Neon Pink */
             --c-good: #ffb703;   /* Golden Yellow */
             --c-normal: #8ecae6; /* Calm Blue */
             --c-bad: #8338ec;    /* Purple */
             --c-awful: #3a0ca3;  /* Deep Dark Blue */
-            --c-empty: rgba(255,255,255,0.05);
+            --c-empty: rgba(255,255,255,0.08); /* Empty Box Color */
         }
 
-        /* Morning (6AM - 11AM): Warm Sunrise */
-        body.theme-morning { --bg-gradient: linear-gradient(135deg, #fce38a, #f38181); --text-color: #5d4037; --grid-bg: rgba(255,255,255,0.4); }
-        
-        /* Day (11AM - 5PM): Blue Sky */
-        body.theme-day { --bg-gradient: linear-gradient(135deg, #4facfe, #00f2fe); --text-color: #0d47a1; --grid-bg: rgba(255,255,255,0.4); }
-        
-        /* Sunset (5PM - 8PM): Purple/Pink */
-        body.theme-sunset { --bg-gradient: linear-gradient(135deg, #667eea, #764ba2); --text-color: white; --grid-bg: rgba(255,255,255,0.15); }
+        /* Morning (6AM - 11AM) */
+        body.theme-morning { --bg-gradient: linear-gradient(135deg, #fce38a, #f38181); --text-color: #5d4037; --c-empty: rgba(255,255,255,0.4); }
+        /* Day (11AM - 5PM) */
+        body.theme-day { --bg-gradient: linear-gradient(135deg, #4facfe, #00f2fe); --text-color: #0d47a1; --c-empty: rgba(255,255,255,0.4); }
+        /* Sunset (5PM - 8PM) */
+        body.theme-sunset { --bg-gradient: linear-gradient(135deg, #667eea, #764ba2); --text-color: white; --c-empty: rgba(255,255,255,0.15); }
 
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg-gradient);
             color: var(--text-color);
             min-height: 100vh;
-            margin: 0; padding: 20px;
+            margin: 0; padding: 10px; /* Less padding on mobile */
             text-align: center;
-            transition: background 3s ease; /* Smooth time transition */
+            transition: background 3s ease;
+            overflow-x: hidden; /* Prevent body scroll, handle grid scroll separately */
         }
 
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 5px; }
-        .subtitle { font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px; font-weight: 300; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; margin-top: 10px; margin-bottom: 5px; }
+        .subtitle { font-size: 0.8rem; opacity: 0.8; margin-bottom: 20px; font-weight: 300; }
 
-        /* --- 2. THE GRID --- */
+        /* --- 2. THE RESPONSIVE GRID --- */
         .year-wrapper {
-            max-width: 600px; margin: 0 auto;
-            overflow-x: auto; /* Allow scroll on small phones */
+            width: 100%;
+            overflow-x: auto; /* Allow horizontal scroll on mobile */
             padding-bottom: 20px;
+            /* Hide scrollbar for cleaner look */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
-        
+        .year-wrapper::-webkit-scrollbar { display: none; }
+
         .year-container {
             display: grid;
             grid-template-columns: repeat(13, 1fr); /* 12 months + labels */
             gap: 4px;
-            min-width: 350px; /* Ensure it doesn't squish too much */
+            margin: 0 auto;
+            
+            /* MOBILE FIRST: Ensure boxes are big enough to tap */
+            min-width: 600px; 
+            max-width: 900px; /* Don't get too wide on giant screens */
+        }
+
+        /* Media Query for Laptop/Desktop */
+        @media (min-width: 768px) {
+            .year-container {
+                /* On desktop, center it and allow it to fill screen without scrolling */
+                width: 80%; 
+                min-width: unset; 
+            }
+            body { padding: 30px; }
+            h1 { font-size: 3rem; }
+        }
+
+        .col-wrapper {
+            display: flex; flex-direction: column; gap: 4px;
         }
 
         .pixel {
             aspect-ratio: 1/1;
             background: var(--c-empty);
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.1s, opacity 0.3s;
         }
-        /* Hover effect only if pixel is active (has ID) */
-        .pixel.active-day:hover { transform: scale(1.3); z-index: 10; border: 1px solid white; }
+        .pixel.active-day:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
         
+        /* THE FIX for "Extra Boxes": Make invalid days invisible */
+        .pixel.hidden-day {
+            visibility: hidden;
+            pointer-events: none;
+            background: transparent;
+        }
+
         /* Labels */
-        .label-month { font-size: 0.6rem; font-weight: bold; padding-bottom: 5px; writing-mode: vertical-rl; transform: rotate(180deg); }
-        .label-day { font-size: 0.6rem; opacity: 0.6; text-align: right; padding-right: 5px; display: flex; align-items: center; justify-content: flex-end;}
+        .label-month { 
+            font-size: 0.75rem; font-weight: bold; padding-bottom: 8px; 
+            writing-mode: vertical-rl; transform: rotate(180deg); /* Vertical Text */
+            height: 40px; display: flex; align-items: center; justify-content: center;
+            opacity: 0.8; letter-spacing: 1px;
+        }
+        .label-day { 
+            font-size: 0.7rem; opacity: 0.6; 
+            display: flex; align-items: center; justify-content: center;
+            aspect-ratio: 1/1; 
+        }
 
         /* --- 3. CONTROLS --- */
         .toggle-btn {
             background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
-            color: var(--text-color); padding: 10px 25px; border-radius: 50px;
-            cursor: pointer; font-size: 0.9rem; margin-bottom: 20px;
+            color: var(--text-color); padding: 8px 20px; border-radius: 50px;
+            cursor: pointer; font-size: 0.85rem; margin-bottom: 20px;
             backdrop-filter: blur(5px); transition: 0.3s; font-weight: 600;
         }
         .toggle-btn:hover { background: rgba(255,255,255,0.4); transform: scale(1.05); }
 
-        /* --- 4. MOOD POPUP (Selector) --- */
+        /* --- 4. MOOD POPUP --- */
         #mood-popup {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: rgba(20, 20, 20, 0.95);
-            padding: 30px 20px; border-radius: 25px 25px 0 0;
+            padding: 30px 20px 50px 20px; /* Extra padding for iPhone home bar */
+            border-radius: 25px 25px 0 0;
             transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex; justify-content: space-around;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
@@ -99,8 +136,6 @@
             cursor: pointer; transition: transform 0.2s; position: relative;
         }
         .mood-option:active { transform: scale(0.9); }
-        
-        /* Tooltip for mood meaning */
         .mood-option::after {
             content: attr(data-label);
             position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
@@ -108,7 +143,7 @@
         }
 
         /* Legend */
-        .legend { display: flex; justify-content: center; gap: 15px; margin-top: 30px; font-size: 0.7rem; opacity: 0.8; flex-wrap: wrap;}
+        .legend { display: flex; justify-content: center; gap: 15px; margin-top: 30px; font-size: 0.7rem; opacity: 0.8; flex-wrap: wrap; padding-bottom: 30px;}
         .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
     </style>
@@ -144,7 +179,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- YOUR EXISTING KEYS ---
+        // --- YOUR KEYS ---
         const firebaseConfig = {
             apiKey: "AIzaSyBznon9j3zMoqT24mWZci29cfGGw41bT-U",
             authDomain: "st-pro-fd169.firebaseapp.com",
@@ -163,173 +198,141 @@
         let currentUser = localStorage.getItem('pixelUser');
         const userParam = urlParams.get('user'); 
 
-        // If URL has ?user=albin, save it!
         if (userParam) {
             currentUser = userParam.toLowerCase();
             localStorage.setItem('pixelUser', currentUser);
-            // Clean the URL so it looks pretty
             window.history.replaceState({}, document.title, window.location.pathname); 
         }
 
-        // --- 2. ATMOSPHERE ENGINE (Time-based) ---
+        // --- 2. ATMOSPHERE ENGINE ---
         function updateAtmosphere() {
             const hour = new Date().getHours();
             const body = document.body;
             let msg = "";
 
             if (hour >= 6 && hour < 11) {
-                body.className = 'theme-morning';
-                msg = "Good Morning, ";
+                body.className = 'theme-morning'; msg = "Good Morning, ";
             } else if (hour >= 11 && hour < 17) {
-                body.className = 'theme-day';
-                msg = "How is your day, ";
+                body.className = 'theme-day'; msg = "How is your day, ";
             } else if (hour >= 17 && hour < 20) {
-                body.className = 'theme-sunset';
-                msg = "Good Evening, ";
+                body.className = 'theme-sunset'; msg = "Good Evening, ";
             } else {
-                body.className = ''; // Night
-                msg = "Rate your day, ";
+                body.className = ''; msg = "Rate your day, ";
             }
 
             if (currentUser) {
                 document.getElementById('greeting').innerText = msg + currentUser.charAt(0).toUpperCase() + currentUser.slice(1) + "?";
             } else {
                 document.getElementById('greeting').innerText = "Please use your login link!";
-                document.getElementById('view-toggle').style.display = 'none'; // Hide button if guest
+                document.getElementById('view-toggle').style.display = 'none';
             }
         }
         updateAtmosphere();
 
         // --- 3. GRID GENERATOR ---
         const gridContainer = document.getElementById('grid-container');
-        const months = ["", "J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+        // Updated Labels to 3 letters
+        const months = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const daysInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-        let viewingUser = currentUser; // Starts by viewing YOUR data
+        let viewingUser = currentUser;
         let activePixelID = null;
 
         function renderGrid() {
             gridContainer.innerHTML = '';
 
-            // Loop 12 Months (Columns)
             for (let m = 0; m <= 12; m++) {
                 const col = document.createElement('div');
-                col.style.display = 'flex';
-                col.style.flexDirection = 'column';
-                col.style.gap = '4px';
+                col.className = 'col-wrapper';
 
-                // Month Label
+                // Label
                 const label = document.createElement('div');
                 label.className = m === 0 ? 'label-day' : 'label-month';
                 label.innerText = m === 0 ? "" : months[m];
                 col.appendChild(label);
 
-                // 31 Days (Rows)
+                // Days
                 for (let d = 1; d <= 31; d++) {
                     const cell = document.createElement('div');
                     
                     if (m === 0) {
-                        // The number labels (1, 2, 3...)
                         cell.className = 'label-day';
                         cell.innerText = d;
-                        cell.style.aspectRatio = '1/1';
                     } else {
-                        // The rating pixel
+                        // Check if day exists in this month
                         if (d <= daysInMonth[m]) {
                             cell.className = 'pixel active-day';
-                            cell.id = `pixel-${m}-${d}`; // Unique ID: pixel-1-20 (Jan 20)
+                            cell.id = `pixel-${m}-${d}`;
                             
-                            // CLICK: Open popup ONLY if it's YOUR grid
+                            // Only clickable if current user
                             cell.onclick = () => {
                                 if (viewingUser === currentUser) {
-                                    activePixelID = `${m}-${d}`; // Remember which day we clicked
+                                    activePixelID = `${m}-${d}`;
                                     document.getElementById('mood-popup').classList.add('open');
                                 } else {
                                     alert(`You are viewing ${viewingUser}'s day. You cannot edit it!`);
                                 }
                             };
                         } else {
-                            // Empty gap for short months (Feb, Apr, etc)
-                            cell.style.aspectRatio = '1/1';
+                            // INVALID DAY (e.g., Feb 30) - Make Invisible
+                            cell.className = 'pixel hidden-day';
                         }
                     }
                     col.appendChild(cell);
                 }
                 gridContainer.appendChild(col);
             }
-            loadData(); // Fetch colors from cloud
+            loadData();
         }
 
-        // --- 4. FIREBASE DATA SYNC ---
+        // --- 4. FIREBASE SYNC ---
         function loadData() {
             if (!currentUser) return;
-
-            // Decide whose data to load
             const target = viewingUser || "guest";
             const userRef = ref(db, `pixels/${target}`);
 
-            // Update Titles
             const title = document.getElementById('page-title');
             title.innerText = viewingUser === currentUser ? "My 2026 in Pixels" : `${viewingUser.toUpperCase()}'s 2026`;
             
             const btn = document.getElementById('view-toggle');
             btn.innerText = viewingUser === currentUser ? "👀 See Partner's Year" : "🔙 Back to My Year";
 
-            // Listen for colors
             onValue(userRef, (snapshot) => {
                 const data = snapshot.val() || {};
                 
-                // Reset all pixels first
+                // Clear colors first
                 document.querySelectorAll('.active-day').forEach(p => p.style.background = 'var(--c-empty)');
                 
-                // Paint the saved pixels
+                // Paint colors
                 Object.keys(data).forEach(key => {
-                    // key is "1-20", value is "good"
                     const el = document.getElementById(`pixel-${key}`);
-                    if (el) {
-                        el.style.background = `var(--c-${data[key]})`;
-                    }
+                    if (el) el.style.background = `var(--c-${data[key]})`;
                 });
             });
         }
 
-        // --- 5. SAVING MOODS ---
+        // --- 5. INTERACTION ---
         window.selectMood = (mood) => {
             if (!activePixelID || !currentUser) return;
-
-            // Save to Firebase: pixels/albin/1-20 = "good"
             set(ref(db, `pixels/${currentUser}/${activePixelID}`), mood);
-
-            // Close popup
             document.getElementById('mood-popup').classList.remove('open');
         };
 
-        // Close popup if clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#mood-popup') && !e.target.closest('.pixel')) {
+            if (!e.target.closest('#mood-popup') && !e.target.closest('.active-day')) {
                 document.getElementById('mood-popup').classList.remove('open');
             }
         });
 
-        // --- 6. SWITCH VIEW BUTTON ---
         window.toggleView = () => {
             if (!currentUser) return alert("Please use your login link first!");
-            
-            // Toggle between 'albin' and 'taa'
             const partner = currentUser === 'albin' ? 'taa' : 'albin';
-            
-            if (viewingUser === currentUser) {
-                viewingUser = partner; // Flip to partner
-            } else {
-                viewingUser = currentUser; // Flip back
-            }
-            renderGrid(); // Re-draw grid (load new data)
+            viewingUser = (viewingUser === currentUser) ? partner : currentUser;
+            renderGrid();
         };
 
-        // Start the engine
         if(currentUser) renderGrid();
 
     </script>
 </body>
 </html>
-
