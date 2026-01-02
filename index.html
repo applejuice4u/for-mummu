@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&family=Indie+Flower&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
@@ -17,22 +17,10 @@
         :root {
             --bg-color: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%);
             --text-color: white;
-            --accent-color: #ff4d6d;
-            --secondary-text: #cbd5e1;
-            --card-bg: rgba(255,255,255,0.08);
-            --card-border: rgba(255,255,255,0.1);
-            --star-color: white;
-            --cork-pattern: repeating-radial-gradient(#d7c49e 0, #d7c49e 1px, #c2ae84 2px, #c2ae84 4px);
-        }
-
-        body.day-mode {
-            --bg-color: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
-            --text-color: #5d4037;
-            --accent-color: #d84315;
-            --secondary-text: #795548;
-            --card-bg: rgba(255, 255, 255, 0.6);
-            --card-border: rgba(93, 64, 55, 0.1);
-            --star-color: #fbc02d;
+            --accent-color: #ff4d6d; /* Neon Pink */
+            --glow-color: rgba(255, 77, 109, 0.5);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.1);
         }
 
         /* --- CORE --- */
@@ -42,25 +30,24 @@
             background: var(--bg-color);
             color: var(--text-color);
             min-height: 100vh;
-            transition: background 0.8s ease;
             overflow-x: hidden;
             padding-bottom: 50px;
         }
 
         /* --- STARS --- */
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
-        .star { position: absolute; background: var(--star-color); border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
+        .star { 
+            position: absolute; background: white; border-radius: 50%; 
+            opacity: 0.8; animation: twinkle var(--duration) infinite; 
+        }
 
         /* --- HEADER --- */
-        header { text-align: center; padding: 30px 20px 10px; }
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--accent-color); }
-        .subtitle { font-size: 0.9rem; color: var(--secondary-text); opacity: 0.8; }
-
-        .theme-toggle {
-            position: absolute; top: 20px; right: 20px;
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
+        header { text-align: center; padding: 40px 20px 10px; }
+        h1 { 
+            font-family: 'Dancing Script', cursive; font-size: 2.5rem; 
+            color: var(--accent-color); text-shadow: 0 0 10px var(--glow-color);
         }
+        .subtitle { font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
 
         /* --- DASHBOARD --- */
         .dashboard {
@@ -68,177 +55,118 @@
             max-width: 500px; margin: 0 auto; padding: 20px;
         }
         .card {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
-            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: box-shadow 0.3s, transform 0.3s;
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 20px; 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            text-align: center; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
 
-        /* --- RED STRING --- */
-        .string-card { padding: 15px 20px; }
-        .string-wrapper {
-            position: relative; width: 100%; height: 60px; 
-            display: flex; align-items: center; justify-content: center; margin-top: 5px;
+        /* --- 1. NEW ENERGY STRING (SVG) --- */
+        .connection-card { padding: 30px 20px; position: relative; overflow: hidden; }
+        .names-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; z-index: 2; position: relative;
         }
-        .beacon {
-            position: absolute; top: 50%; transform: translate(0, -50%);
-            display: flex; flex-direction: column; align-items: center; z-index: 10;
+        .connection-status {
+            font-size: 0.6rem; opacity: 0.5; margin-top: -15px; margin-bottom: 20px; text-transform: uppercase;
         }
-        .beacon-dot {
-            width: 12px; height: 12px; background: var(--accent-color);
-            border-radius: 50%; box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
-            transition: transform 0.3s;
+        
+        /* The Glowing Line */
+        .svg-container {
+            position: absolute; top: 50%; left: 0; width: 100%; height: 100%;
+            transform: translateY(-50%); pointer-events: none; z-index: 1;
         }
-        .beacon-label {
-            margin-top: 10px; font-size: 0.7rem; font-weight: bold;
-            color: var(--text-color); letter-spacing: 1px;
+        .energy-line {
+            fill: none; stroke: var(--accent-color); stroke-width: 2;
+            stroke-dasharray: 10, 10; opacity: 0.3;
         }
-        .beacon-left { left: 0; }
-        .beacon-right { right: 0; }
-        .active-pulse .beacon-dot { transform: scale(1.5); background: white; }
+        .energy-packet {
+            fill: white; filter: drop-shadow(0 0 5px var(--accent-color));
+        }
 
-        /* --- CLOCKS & COUNTER --- */
+        /* --- 2. GLASS NOTES (Replaces Corkboard) --- */
+        .glass-notes-card { min-height: 250px; display: flex; flex-direction: column; }
+        .notes-grid {
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
+            max-height: 300px; overflow-y: auto;
+        }
+        .glass-note {
+            background: rgba(255, 77, 109, 0.1); 
+            border-left: 3px solid var(--accent-color);
+            padding: 12px; border-radius: 0 10px 10px 0;
+            text-align: left; font-size: 0.9rem; color: #eee;
+            animation: slideIn 0.3s ease-out;
+        }
+        .note-time { font-size: 0.6rem; opacity: 0.5; display: block; margin-bottom: 4px; }
+
+        .input-area {
+            display: flex; gap: 10px; margin-top: auto;
+        }
+        .glass-input {
+            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+            padding: 10px 15px; border-radius: 50px; color: white; outline: none;
+        }
+        .glass-btn {
+            background: var(--accent-color); border: none; width: 40px; height: 40px;
+            border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- CLOCKS --- */
         .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .clock-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 5px; }
-        .clock-time { font-size: 1.2rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; }
-        .counter-card { grid-column: span 2; } 
-        .counter-num { font-size: 2rem; font-weight: bold; color: var(--accent-color); transition: transform 0.2s; }
-        .counter-text { font-size: 0.8rem; opacity: 0.8; }
-        .counter-highlight { color: #fff; transform: scale(1.2); }
+        .clock-time { font-size: 1.4rem; font-weight: 600; color: var(--accent-color); font-family: 'Courier New', monospace; text-shadow: 0 0 10px var(--glow-color); }
+        .clock-label { font-size: 0.65rem; opacity: 0.7; letter-spacing: 1px; }
 
-        /* --- CORKBOARD SECTION (NEW) --- */
-        .corkboard-card {
-            background: #c0a062; /* Fallback */
-            background-image: var(--cork-pattern);
-            border: 8px solid #8d6e3f;
-            min-height: 250px;
-            display: flex; flex-direction: column; align-items: center;
-            position: relative;
-            overflow: hidden;
-            padding-bottom: 60px; /* Space for input */
-        }
-        .cork-title {
-            background: rgba(0,0,0,0.4); color: white;
-            padding: 5px 15px; border-radius: 5px; font-size: 0.8rem; margin-bottom: 15px;
-            font-family: 'Poppins', sans-serif;
-        }
+        /* --- CAT --- */
+        .cat-card { min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        .notes-container {
-            width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .sticky-note {
-            width: 45%; max-width: 120px; aspect-ratio: 1/1;
-            background: #ffeb3b; /* Default Yellow */
-            color: #333;
-            font-family: 'Indie Flower', cursive; /* Handwritten Font */
-            font-size: 1rem; line-height: 1.2;
-            padding: 15px 10px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            text-align: center;
-            position: relative;
-            transform: rotate(-2deg);
-            transition: transform 0.2s;
-            animation: popIn 0.3s ease-out;
-            word-wrap: break-word;
-        }
-        .sticky-note:nth-child(even) { transform: rotate(3deg); background: #ff80ab; color: white; }
-        .sticky-note:nth-child(3n) { transform: rotate(-4deg); background: #80d8ff; color: #333; }
-        .sticky-note:hover { transform: scale(1.1) rotate(0deg); z-index: 10; }
-        
-        .pin {
-            width: 8px; height: 8px; background: #d32f2f; border-radius: 50%;
-            position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
-            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .note-input-area {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            background: rgba(0,0,0,0.6); padding: 10px;
-            display: flex; gap: 5px;
-        }
-        .note-input {
-            flex: 1; padding: 8px; border-radius: 5px; border: none; font-family: 'Indie Flower', cursive;
-            font-size: 1rem;
-        }
-        .note-btn {
-            background: var(--accent-color); color: white; border: none;
-            padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer;
-        }
-
-        /* --- CAT & JAR & BUTTON --- */
-        .cat-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
-        .cat-caption { font-size: 0.8rem; margin-top: -10px; opacity: 0.7; font-style: italic; }
-
-        .love-jar-btn {
-            background: var(--accent-color); color: white; border: none;
-            padding: 12px 25px; border-radius: 50px; font-size: 1rem;
-            cursor: pointer; width: 100%; font-family: 'Poppins', sans-serif;
-            font-weight: 600; transition: transform 0.1s;
-        }
-        .love-jar-btn:active { transform: scale(0.95); }
-        #jar-content {
-            margin-top: 15px; min-height: 40px; font-style: italic;
-            color: var(--secondary-text); font-size: 0.95rem; display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .pulse-container { display: flex; align-items: center; justify-content: space-between; }
+        /* --- PULSE --- */
         .pulse-btn {
-            background: none; border: 2px solid var(--accent-color);
-            color: var(--accent-color); width: 50px; height: 50px;
+            background: transparent; border: 2px solid var(--accent-color);
+            color: var(--accent-color); width: 60px; height: 60px;
             border-radius: 50%; font-size: 1.5rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px var(--glow-color); transition: 0.2s;
         }
-        .pulse-anim { animation: heartbeat 0.6s infinite; }
-        
-        .visit-footer { text-align: center; font-size: 0.75rem; opacity: 0.5; margin-top: 20px; letter-spacing: 0.5px; }
+        .pulse-btn:active { transform: scale(0.9); background: var(--accent-color); color: white; }
 
-        /* --- HEART RAIN --- */
-        .heart-particle {
-            position: fixed; bottom: -50px; font-size: 24px;
-            animation: floatUp 4s linear forwards; z-index: 9999; pointer-events: none;
-        }
-
-        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-110vh) scale(1.5); opacity: 0; } }
-        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        /* ANIMATIONS */
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        /* Heart Rain */
+        .heart-particle { position: fixed; bottom: -50px; font-size: 24px; animation: floatUp 4s linear forwards; z-index: 100; pointer-events: none; }
+        @keyframes floatUp { to { transform: translateY(-110vh) scale(1.5); opacity: 0; } }
 
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" onclick="document.body.classList.toggle('day-mode')">☀️</button>
     <div class="stars" id="star-container"></div>
 
     <header>
         <h1>Mummuu's Dashboard</h1>
-        <div class="subtitle">Connected by fate, synced by love.</div>
+        <div class="subtitle">Beta 2.0 • Interstellar Link</div>
     </header>
 
     <div class="dashboard">
-        
-        <div class="card string-card" id="string-card">
-            <div class="clock-label" style="text-align: center; margin-bottom: 10px;">THE RED STRING</div>
-            <div class="string-wrapper">
-                <div class="beacon beacon-left">
-                    <div class="beacon-dot"></div>
-                    <div class="beacon-label">ALBIN</div>
-                </div>
-                <lottie-player 
-                    src="string.json" background="transparent" speed="1"  
-                    style="width: 100%; height: 100%; opacity: 1.0;"  
-                    loop autoplay preserveAspectRatio="none">
-                </lottie-player>
-                <div class="beacon beacon-right">
-                    <div class="beacon-dot"></div>
-                    <div class="beacon-label">TAA</div>
-                </div>
+
+        <div class="card connection-card">
+            <div class="connection-status">Quantum Link Active</div>
+            <div class="names-row">
+                <div>ALBIN</div>
+                <div>TAA</div>
             </div>
+            <svg class="svg-container" viewBox="0 0 300 50" preserveAspectRatio="none">
+                <path d="M 10 25 Q 150 25 290 25" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none" />
+                <path class="energy-line" d="M 10 25 Q 150 55 290 25">
+                    <animate attributeName="d" values="M 10 25 Q 150 55 290 25; M 10 25 Q 150 -5 290 25; M 10 25 Q 150 55 290 25" dur="3s" repeatCount="indefinite" />
+                </path>
+                <circle r="4" class="energy-packet">
+                    <animateMotion dur="2s" repeatCount="indefinite" path="M 10 25 Q 150 55 290 25" />
+                </circle>
+                <circle r="3" class="energy-packet" fill="#4facfe">
+                    <animateMotion dur="2.5s" begin="1s" repeatCount="indefinite" path="M 290 25 Q 150 -5 10 25" />
+                </circle>
+            </svg>
         </div>
 
         <div class="time-row">
@@ -250,22 +178,16 @@
                 <div class="clock-label">INDO (SAYANG)</div>
                 <div class="clock-time" id="time-indo">--:--</div>
             </div>
-            <div class="card counter-card">
-                <div class="counter-num" id="global-counter">Loading...</div>
-                <div class="counter-text">Total times we touched hearts ❤️</div>
-            </div>
         </div>
 
-        <div class="card corkboard-card">
-            <div class="cork-title">📌 Our Messy Board</div>
-            
-            <div class="notes-container" id="notes-board">
-                <div style="font-size: 0.8rem; opacity: 0.6; color: #333; margin-top: 50px;">Waiting for notes...</div>
+        <div class="card glass-notes-card">
+            <div class="clock-label" style="margin-bottom: 15px;">HOLOGRAPHIC LOGS</div>
+            <div class="notes-grid" id="notes-board">
+                <div style="font-size: 0.8rem; opacity: 0.5;">No signals received yet...</div>
             </div>
-
-            <div class="note-input-area">
-                <input type="text" id="noteInput" class="note-input" placeholder="Write a sticky note..." maxlength="25">
-                <button class="note-btn" id="postNoteBtn">POST</button>
+            <div class="input-area">
+                <input type="text" id="noteInput" class="glass-input" placeholder="Transmit message..." maxlength="40">
+                <button class="glass-btn" id="postNoteBtn">➤</button>
             </div>
         </div>
 
@@ -274,24 +196,15 @@
                 src="cat.json" background="transparent" speed="1"  
                 style="width: 150px; height: 150px;" loop autoplay>
             </lottie-player>
-            <div class="cat-caption">Guarding Bubu's love for you.</div>
+            <div style="font-size: 0.8rem; opacity: 0.6; font-style: italic;">Guarding the link.</div>
         </div>
 
-        <div class="card">
-            <button class="love-jar-btn" onclick="openJar()">🍯 I need a smile</button>
-            <div id="jar-content"></div>
-        </div>
-
-        <div class="card pulse-container">
+        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 25px;">
             <div style="text-align: left;">
-                <div style="font-weight: bold;">Virtual Touch</div>
-                <div style="font-size: 0.8rem; opacity: 0.7;">Click to rain hearts on her screen.</div>
+                <div style="font-weight: bold; font-size: 0.9rem;">Send Pulse</div>
+                <div style="font-size: 0.7rem; opacity: 0.6;">Touch to vibrate her screen</div>
             </div>
             <button class="pulse-btn" id="pulseBtn">❤️</button>
-        </div>
-
-        <div class="visit-footer" id="visit-display">
-            You've visited home: 1 time 💛
         </div>
 
     </div>
@@ -317,33 +230,23 @@
         // --- 1. HEARTBEAT LOGIC ---
         const pulseBtn = document.getElementById("pulseBtn");
         pulseBtn.addEventListener("click", () => {
-            pulseBtn.classList.add('pulse-anim');
-            setTimeout(() => pulseBtn.classList.remove('pulse-anim'), 1000);
-            if (navigator.vibrate) navigator.vibrate([100]);
-            
-            runTransaction(ref(db, 'heartbeats/count'), (count) => (count || 0) + 1);
+            if (navigator.vibrate) navigator.vibrate(100);
             set(ref(db, 'heartbeats/lastPulse'), Date.now());
         });
 
-        // Read Heartbeat
-        onValue(ref(db, 'heartbeats/count'), (snapshot) => {
-            document.getElementById("global-counter").innerText = snapshot.val() || 0;
-        });
-
-        // Read Pulse Rain
+        // Listen for Heart Rain
         onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
             if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
                 createHeartRain();
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
             }
         });
 
-        // --- 2. CORKBOARD LOGIC (NEW) ---
+        // --- 2. GLASS NOTES LOGIC ---
         const noteInput = document.getElementById("noteInput");
         const postBtn = document.getElementById("postNoteBtn");
         const notesBoard = document.getElementById("notes-board");
 
-        // Write Note
         postBtn.addEventListener("click", () => {
             const text = noteInput.value.trim();
             if (text) {
@@ -351,60 +254,60 @@
                     text: text,
                     timestamp: Date.now()
                 });
-                noteInput.value = ""; // Clear input
+                noteInput.value = ""; 
             }
         });
 
-        // Read Notes (Limit to last 6 to keep it clean)
-        const notesQuery = query(ref(db, 'notes'), limitToLast(6));
-        
+        // Read Notes (Last 10)
+        const notesQuery = query(ref(db, 'notes'), limitToLast(10));
         onValue(notesQuery, (snapshot) => {
-            notesBoard.innerHTML = ""; // Clear board
-            
+            notesBoard.innerHTML = ""; 
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                // Convert object to array and reverse to show newest first
                 Object.values(data).forEach((note) => {
+                    const date = new Date(note.timestamp);
+                    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
                     const noteEl = document.createElement("div");
-                    noteEl.className = "sticky-note";
-                    noteEl.innerHTML = `<div class="pin"></div>${note.text}`;
-                    notesBoard.appendChild(noteEl);
+                    noteEl.className = "glass-note";
+                    noteEl.innerHTML = `<span class="note-time">${timeStr}</span>${note.text}`;
+                    // Prepend to show newest at bottom (chat style) or append for top
+                    notesBoard.prepend(noteEl); 
                 });
-            } else {
-                 notesBoard.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.6; color: #333; margin-top: 50px;">Be the first to leave a note! 📝</div>';
             }
         });
 
-        // --- HEART RAIN FX ---
+        // --- FX ---
         function createHeartRain() {
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 20; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.classList.add('heart-particle');
                     heart.innerHTML = '❤️';
                     heart.style.left = Math.random() * 100 + "vw";
-                    heart.style.animationDuration = (Math.random() * 2 + 3) + "s";
-                    heart.style.fontSize = (Math.random() * 20 + 20) + "px";
+                    heart.style.animationDuration = (Math.random() * 2 + 2) + "s";
                     document.body.appendChild(heart);
-                    setTimeout(() => heart.remove(), 5000);
+                    setTimeout(() => heart.remove(), 4000);
                 }, i * 100);
             }
         }
     </script>
 
     <script>
+        // STARS
         const starsContainer = document.getElementById('star-container');
-        for(let i=0; i<50; i++) {
+        for(let i=0; i<60; i++) {
             let star = document.createElement('div');
             star.className = 'star';
             star.style.left = Math.random() * 100 + '%';
             star.style.top = Math.random() * 100 + '%';
-            star.style.width = Math.random() * 3 + 'px';
+            star.style.width = Math.random() * 2 + 'px';
             star.style.height = star.style.width;
-            star.style.setProperty('--duration', (Math.random() * 2 + 1) + 's');
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
             starsContainer.appendChild(star);
         }
 
+        // CLOCKS
         function updateClocks() {
             const now = new Date();
             const optionsIndia = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false };
@@ -414,23 +317,6 @@
         }
         setInterval(updateClocks, 1000);
         updateClocks();
-
-        const messages = [
-            "You are my favorite notification. 📱", "Drink some water! 💧", "Bubu is thinking of you. 💭",
-            "You look beautiful today. ✨", "I'm proud of you. 📚", "I love you more. ❤️",
-            "Distance means nothing. 🌍", "Giant virtual hug! 🤗", "Best thing in 2025. 🌟",
-            "Keep smiling, Muthe.", "Working hard for us. 💼", "Bubu is here."
-        ];
-        function openJar() {
-            const display = document.getElementById('jar-content');
-            display.style.display = 'block';
-            display.innerText = '"' + messages[Math.floor(Math.random() * messages.length)] + '"';
-        }
-
-        let visitCount = localStorage.getItem('visitCount');
-        if (!visitCount) { visitCount = 1; } else { visitCount = parseInt(visitCount) + 1; }
-        localStorage.setItem('visitCount', visitCount);
-        document.getElementById('visit-display').innerText = `You've visited home: ${visitCount} times 💛`;
     </script>
 </body>
 </html>
