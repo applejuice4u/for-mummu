@@ -4,146 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mummuu's Dashboard</title>
-    
     <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"> <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         /* --- VARIABLES --- */
         :root {
-            --bg-dark: #0f0c29;
             --bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
             --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #ff4d6d;
             --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.6);
         }
 
-        /* --- CORE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg-gradient);
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 100px; /* Space for cat & pulse */
+            padding-bottom: 100px;
         }
 
-        /* --- BACKGROUND STARS --- */
-        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
+        /* --- IDENTITY MODAL --- */
+        .identity-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .identity-box {
+            background: #1a1a2e; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--accent);
+        }
+        .id-btn {
+            padding: 10px 20px; margin: 10px; font-size: 1.2rem; border-radius: 10px; border: none; cursor: pointer;
+            background: rgba(255,255,255,0.1); color: white; transition: 0.3s;
+        }
+        .id-btn:hover { background: var(--accent); }
 
-        /* --- HEADER & TIMER --- */
+        /* --- HEADER --- */
         header { text-align: center; padding: 30px 20px 10px; position: relative; }
         .names-container { 
             display: flex; justify-content: space-between; align-items: center; 
-            max-width: 350px; margin: 0 auto; font-weight: 600; letter-spacing: 2px;
-            font-size: 0.9rem; color: var(--accent);
+            max-width: 350px; margin: 0 auto; 
+            /* NEW FONT HERE */
+            font-family: 'Pacifico', cursive; 
+            font-size: 1.5rem; color: var(--accent);
+            text-shadow: 0 0 10px rgba(255, 77, 109, 0.6);
         }
         .constellation-canvas {
-            position: absolute; top: 35px; left: 50%; transform: translateX(-50%);
-            width: 300px; height: 20px; z-index: 0; opacity: 0.5; pointer-events: none;
+            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+            width: 300px; height: 20px; opacity: 0.5; pointer-events: none;
         }
-        .infinite-timer { margin-top: 15px; }
-        .timer-label { font-family: 'Dancing Script', cursive; font-size: 1.2rem; opacity: 0.8; }
-        .timer-digits { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; margin-top: 5px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+        .infinite-timer { margin-top: 20px; }
+        .timer-digits { font-family: 'Courier New', monospace; font-size: 1rem; opacity: 0.8; }
 
-        /* --- BENTO GRID LAYOUT --- */
+        /* --- GRID --- */
         .grid-container {
-            display: grid;
-            grid-template-columns: 1fr; /* Mobile default */
-            gap: 15px;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0 15px;
+            display: grid; grid-template-columns: 1fr; gap: 15px;
+            max-width: 600px; margin: 20px auto; padding: 0 15px;
         }
-        @media (min-width: 600px) {
-            .grid-container { grid-template-columns: 1fr 1fr; }
-            .span-2 { grid-column: span 2; }
-        }
+        @media (min-width: 600px) { .grid-container { grid-template-columns: 1fr 1fr; } .span-2 { grid-column: span 2; } }
 
-        /* --- GLASS CARDS --- */
         .card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
+            background: var(--glass-bg); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
         }
-        .card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
+        .card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-bottom: 15px; }
 
-        /* --- 1. MOOD STATION --- */
+        /* --- MOOD --- */
         .mood-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .mood-label { font-size: 0.7rem; margin-bottom: 5px; opacity: 0.8; }
         .mood-btn {
             background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
-            width: 35px; height: 35px; cursor: pointer; font-size: 1.1rem;
-            transition: 0.2s;
+            width: 35px; height: 35px; cursor: pointer; font-size: 1.1rem; transition: 0.2s;
         }
         .mood-btn.active { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 10px var(--accent); }
         
-        /* --- 2. MEMORY BOX --- */
-        .memory-text { font-style: italic; font-size: 0.95rem; line-height: 1.5; min-height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .shuffle-btn { background: transparent; border: 1px solid var(--text-dim); color: var(--text-dim); padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; cursor: pointer; }
+        /* LOCKED STATE (Greyed out) */
+        .locked-row { opacity: 0.3; pointer-events: none; filter: grayscale(100%); }
 
-        /* --- 3. FOCUS TRACKER --- */
-        .focus-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .focus-item:last-child { border-bottom: none; }
+        /* --- FOCUS --- */
+        .focus-item { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
         .focus-who { font-size: 0.7rem; color: var(--accent); font-weight: bold; }
-        .focus-what { font-size: 0.9rem; margin: 2px 0; }
-        .focus-days { font-size: 0.75rem; opacity: 0.6; text-align: right; }
+        .focus-what { font-size: 1rem; font-weight: 600; }
+        .focus-days { font-size: 0.8rem; opacity: 0.7; }
 
-        /* --- 4. VISITOR LOG --- */
-        .visit-count { font-size: 2rem; font-weight: bold; color: white; text-align: center; }
-        .visit-sub { font-size: 0.7rem; text-align: center; opacity: 0.6; }
-
-        /* --- 5. TIMELINE --- */
-        .timeline-scroll { max-height: 120px; overflow-y: auto; padding-right: 5px; }
-        .timeline-event { display: flex; gap: 10px; margin-bottom: 12px; }
+        /* --- TIMELINE --- */
+        .timeline-scroll { max-height: 150px; overflow-y: auto; }
+        .timeline-event { display: flex; gap: 10px; margin-bottom: 15px; }
         .event-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
-        .event-content h4 { font-size: 0.85rem; font-weight: 600; }
-        .event-content p { font-size: 0.75rem; opacity: 0.6; }
+        .event-date { font-size: 0.8rem; font-weight: bold; color: var(--accent); }
+        .event-desc { font-size: 0.8rem; opacity: 0.8; }
 
-        /* --- BOTTOM CORNER ELEMENTS --- */
-        
-        /* Pulse (Right) */
-        .pulse-container {
-            position: fixed; bottom: 20px; right: 20px; z-index: 100;
-        }
+        /* --- CORNER ELEMENTS --- */
+        .pulse-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
         .pulse-btn {
-            width: 60px; height: 60px; border-radius: 50%;
-            background: rgba(255, 77, 109, 0.2); border: 2px solid var(--accent);
-            color: var(--accent); font-size: 1.5rem; cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 77, 109, 0.3);
-            backdrop-filter: blur(5px);
+            width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 77, 109, 0.2); 
+            border: 2px solid var(--accent); color: var(--accent); font-size: 1.5rem; cursor: pointer;
         }
-        .pulse-btn:active { transform: scale(0.9); background: var(--accent); color: white; }
-
-        /* Cat (Left) */
-        .cat-container {
-            position: fixed; bottom: 10px; left: 10px; z-index: 100;
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
-            pointer-events: none; /* Let clicks pass through if needed */
-        }
-
-        /* ANIMATIONS */
+        .cat-container { position: fixed; bottom: 10px; left: 10px; z-index: 100; pointer-events: none; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        .heart-particle { position: fixed; bottom: -50px; font-size: 24px; animation: floatUp 3s linear forwards; z-index: 999; pointer-events: none; }
-        @keyframes floatUp { to { transform: translateY(-110vh) scale(1.2); opacity: 0; } }
 
     </style>
 </head>
 <body>
+
+    <div id="identity-modal" class="identity-overlay" style="display:none;">
+        <div class="identity-box">
+            <h2 style="margin-bottom:20px;">Who is this?</h2>
+            <button class="id-btn" onclick="setIdentity('bubu')">🐻 Bubu</button>
+            <button class="id-btn" onclick="setIdentity('mumu')">🐱 Mumu</button>
+        </div>
+    </div>
 
     <div class="stars" id="star-container"></div>
 
@@ -153,10 +128,8 @@
             <span>MUMU</span>
         </div>
         <canvas class="constellation-canvas" id="constellation"></canvas>
-
         <div class="infinite-timer">
-            <div class="timer-label">Loving each other for...</div>
-            <div class="timer-digits" id="timer-display">Loading timeline...</div>
+            <div class="timer-digits" id="timer-display">Loading love...</div>
         </div>
     </header>
 
@@ -165,105 +138,66 @@
         <div class="card span-2">
             <div class="card-title">Mood Station</div>
             
-            <div class="mood-label">Bubu is feeling:</div>
-            <div class="mood-row" id="mood-albin">
-                <button class="mood-btn" onclick="setMood('albin', '😊')">😊</button>
-                <button class="mood-btn" onclick="setMood('albin', '😔')">😔</button>
-                <button class="mood-btn" onclick="setMood('albin', '😴')">😴</button>
-                <button class="mood-btn" onclick="setMood('albin', '❤️')">❤️</button>
+            <div style="font-size:0.7rem; margin-bottom:5px;">Bubu is feeling:</div>
+            <div class="mood-row" id="mood-row-bubu">
+                <button class="mood-btn" onclick="setMood('bubu', '😊')">😊</button>
+                <button class="mood-btn" onclick="setMood('bubu', '😔')">😔</button>
+                <button class="mood-btn" onclick="setMood('bubu', '😴')">😴</button>
+                <button class="mood-btn" onclick="setMood('bubu', '❤️')">❤️</button>
             </div>
 
-            <div class="mood-label" style="margin-top: 10px;">Mumu is feeling:</div>
-            <div class="mood-row" id="mood-taa">
-                <button class="mood-btn" onclick="setMood('taa', '😊')">😊</button>
-                <button class="mood-btn" onclick="setMood('taa', '😔')">😔</button>
-                <button class="mood-btn" onclick="setMood('taa', '😴')">😴</button>
-                <button class="mood-btn" onclick="setMood('taa', '❤️')">❤️</button>
+            <div style="font-size:0.7rem; margin-bottom:5px;">Mumu is feeling:</div>
+            <div class="mood-row" id="mood-row-mumu">
+                <button class="mood-btn" onclick="setMood('mumu', '😊')">😊</button>
+                <button class="mood-btn" onclick="setMood('mumu', '😔')">😔</button>
+                <button class="mood-btn" onclick="setMood('mumu', '😴')">😴</button>
+                <button class="mood-btn" onclick="setMood('mumu', '❤️')">❤️</button>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">
-                <span>Memory Box</span>
-                <button class="shuffle-btn" id="shuffleBtn">Shuffle ↻</button>
-            </div>
-            <div class="memory-text" id="memory-display">
-                "Click shuffle to remember a moment..."
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Daily Connection</div>
-            <div class="visit-count" id="visit-count">0</div>
-            <div class="visit-sub">Shared visits today</div>
         </div>
 
         <div class="card">
             <div class="card-title">Current Focus</div>
             <div class="focus-item">
                 <div class="focus-who">BUBU'S MISSION</div>
-                <div class="focus-what" contenteditable="true" id="focus-albin-text">Solids Exam</div>
-                <div class="focus-days" id="focus-albin-days">Calculating...</div>
+                <div class="focus-what" id="focus-bubu-text">...</div>
+                <div class="focus-days" id="focus-bubu-days">...</div>
             </div>
             <div class="focus-item">
                 <div class="focus-who">MUMU'S MISSION</div>
-                <div class="focus-what" contenteditable="true" id="focus-taa-text">Project Submission</div>
-                <div class="focus-days" id="focus-taa-days">Calculating...</div>
+                <div class="focus-what" id="focus-mumu-text">...</div>
+                <div class="focus-days" id="focus-mumu-days">...</div>
             </div>
         </div>
 
-        <div class="card span-2">
+        <div class="card">
             <div class="card-title">Our Story</div>
-            <div class="timeline-scroll">
-                <div class="timeline-event">
-                    <div class="event-dot"></div>
-                    <div class="event-content">
-                        <h4>Oct 21, 2025</h4>
-                        <p>The day it all began. ❤️</p>
-                    </div>
+            <div class="timeline-scroll" id="timeline-container">
                 </div>
-                <div class="timeline-event">
-                    <div class="event-dot"></div>
-                    <div class="event-content">
-                        <h4>Nov 05, 2025</h4>
-                        <p>First "I miss you".</p>
-                    </div>
-                </div>
-                <div class="timeline-event">
-                    <div class="event-dot"></div>
-                    <div class="event-content">
-                        <h4>Dec 25, 2025</h4>
-                        <p>Our first Christmas call.</p>
-                    </div>
-                </div>
-            </div>
         </div>
-
-        <div class="card span-2" style="padding: 10px;">
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        
+        <div class="card">
+            <div class="card-title">
+                <span>Memory Box</span>
+                <button onclick="shuffleMemory()" style="background:none; border:1px solid #fff; color:#fff; border-radius:10px; padding:2px 8px; cursor:pointer;">↻</button>
+            </div>
+            <div id="memory-text" style="font-style:italic; min-height:50px; display:flex; align-items:center; justify-content:center;">
+                "Loading memories..."
+            </div>
         </div>
 
     </div>
 
     <div class="cat-container">
-        <lottie-player 
-            src="cat.json" 
-            background="transparent" 
-            speed="1" 
-            style="width: 120px; height: 120px;" 
-            loop autoplay>
-        </lottie-player>
+        <lottie-player src="cat.json" background="transparent" speed="1" style="width: 120px; height: 120px;" loop autoplay></lottie-player>
     </div>
-
     <div class="pulse-container">
         <button class="pulse-btn" id="pulseBtn">❤️</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, runTransaction, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- KEYS ---
         const firebaseConfig = {
             apiKey: "AIzaSyBznon9j3zMoqT24mWZci29cfGGw41bT-U",
             authDomain: "st-pro-fd169.firebaseapp.com",
@@ -277,139 +211,112 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- GLOBAL FUNCTIONS ---
+        // --- IDENTITY SYSTEM ---
+        const modal = document.getElementById('identity-modal');
+        const userRole = localStorage.getItem('user_role');
+
+        if (!userRole) {
+            modal.style.display = 'flex'; // Show if no role saved
+        } else {
+            applyLocks(userRole);
+        }
+
+        window.setIdentity = function(role) {
+            localStorage.setItem('user_role', role);
+            modal.style.display = 'none';
+            applyLocks(role);
+        }
+
+        function applyLocks(role) {
+            // If I am Bubu, Lock Mumu's row
+            if (role === 'bubu') {
+                document.getElementById('mood-row-mumu').classList.add('locked-row');
+            } 
+            // If I am Mumu, Lock Bubu's row
+            else if (role === 'mumu') {
+                document.getElementById('mood-row-bubu').classList.add('locked-row');
+            }
+        }
+
+        // --- MOODS ---
         window.setMood = function(person, mood) {
             set(ref(db, `moods/${person}`), mood);
         }
+        onValue(ref(db, 'moods'), (snap) => {
+            const data = snap.val() || {};
+            // Update UI
+            document.querySelectorAll('#mood-row-bubu .mood-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === data.bubu));
+            document.querySelectorAll('#mood-row-mumu .mood-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === data.mumu));
+        });
 
-        // --- 1. MOOD SYNC ---
-        onValue(ref(db, 'moods'), (snapshot) => {
-            const data = snapshot.val() || {};
-            // Update Bubu (Albin)
-            document.querySelectorAll('#mood-albin .mood-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText === data.albin);
-            });
-            // Update Mumu (Taa)
-            document.querySelectorAll('#mood-taa .mood-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText === data.taa);
+        // --- FOCUS TRACKER (Read from DB) ---
+        onValue(ref(db, 'focus'), (snap) => {
+            const data = snap.val() || {};
+            
+            // Bubu
+            document.getElementById('focus-bubu-text').innerText = data.bubuText || "No Mission";
+            if(data.bubuDate) {
+                const days = Math.ceil((new Date(data.bubuDate) - new Date()) / (1000 * 60 * 60 * 24));
+                document.getElementById('focus-bubu-days').innerText = days > 0 ? `${days} days left` : "Completed";
+            }
+
+            // Mumu
+            document.getElementById('focus-mumu-text').innerText = data.mumuText || "No Mission";
+            if(data.mumuDate) {
+                const days = Math.ceil((new Date(data.mumuDate) - new Date()) / (1000 * 60 * 60 * 24));
+                document.getElementById('focus-mumu-days').innerText = days > 0 ? `${days} days left` : "Completed";
+            }
+        });
+
+        // --- TIMELINE (Read from DB) ---
+        onValue(ref(db, 'timeline'), (snap) => {
+            const list = document.getElementById('timeline-container');
+            list.innerHTML = "";
+            const events = snap.val() || {};
+            
+            // Sort by date key (YYYY-MM-DD)
+            Object.keys(events).sort().forEach(key => {
+                const evt = events[key];
+                const div = document.createElement('div');
+                div.className = 'timeline-event';
+                div.innerHTML = `
+                    <div class="event-dot"></div>
+                    <div>
+                        <div class="event-date">${evt.date}</div>
+                        <div class="event-desc">${evt.title}</div>
+                    </div>
+                `;
+                list.appendChild(div);
             });
         });
 
-        // --- 2. MEMORY BOX ---
-        const memories = [
-            "That time you fell asleep on the call...",
-            "When we watched that Batman movie together.",
-            "The first time you said my name.",
-            "When we planned our dream house.",
-            "Laughing at 2 AM about nothing.",
-            "The way you smile when you see me."
-        ];
-        
-        document.getElementById('shuffleBtn').addEventListener('click', () => {
-            const random = memories[Math.floor(Math.random() * memories.length)];
-            document.getElementById('memory-display').innerText = `"${random}"`;
+        // --- MEMORY BOX (Read from DB) ---
+        let memoryList = ["Loading..."];
+        onValue(ref(db, 'memories'), (snap) => {
+            if(snap.exists()) memoryList = Object.values(snap.val());
+            else memoryList = ["No memories added yet!"];
+            shuffleMemory();
         });
 
-        // --- 3. DAILY VISITOR LOG ---
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const visitRef = ref(db, `visits/${todayStr}`);
-        
-        if(!sessionStorage.getItem('visited')) {
-            runTransaction(visitRef, (count) => (count || 0) + 1);
-            sessionStorage.setItem('visited', 'true');
+        window.shuffleMemory = function() {
+            const random = memoryList[Math.floor(Math.random() * memoryList.length)];
+            document.getElementById('memory-text').innerText = `"${random}"`;
         }
-        onValue(visitRef, (snapshot) => {
-            document.getElementById('visit-count').innerText = snapshot.val() || 0;
-        });
 
-        // --- 4. PULSE ---
-        const pulseBtn = document.getElementById("pulseBtn");
-        pulseBtn.addEventListener("click", () => {
+        // --- PULSE ---
+        document.getElementById("pulseBtn").addEventListener("click", () => {
             set(ref(db, 'heartbeats/lastPulse'), Date.now());
         });
-        
         onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
             if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
-                confetti({
-                    particleCount: 50, spread: 60, origin: { y: 0.9 },
-                    colors: ['#ff4d6d', '#ffffff'],
-                    ticks: 200
-                });
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.9 }, colors: ['#ff4d6d', '#ffffff'] });
             }
         });
 
     </script>
 
     <script>
-        // --- 1. INFINITE TIMER ---
-        const startDate = new Date("2025-10-21T00:00:00");
-
-        function updateTimer() {
-            const now = new Date();
-            const diff = now - startDate;
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / (1000 * 60)) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-
-            document.getElementById('timer-display').innerText = 
-                `${days} Days, ${hours}h ${minutes}m ${seconds}s`;
-        }
-        setInterval(updateTimer, 1000);
-        updateTimer();
-
-        // --- 2. FOCUS TRACKER ---
-        const albinExam = new Date("2026-01-20");
-        const taaProject = new Date("2026-01-15");
-
-        function getDaysLeft(target) {
-            const diff = target - new Date();
-            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-            return days > 0 ? `${days} days left` : "Done!";
-        }
-        document.getElementById('focus-albin-days').innerText = getDaysLeft(albinExam);
-        document.getElementById('focus-taa-days').innerText = getDaysLeft(taaProject);
-
-        // --- 3. CONSTELLATION CANVAS ---
-        const canvas = document.getElementById('constellation');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-
-        function resize() {
-            width = canvas.width = canvas.offsetWidth;
-            height = canvas.height = canvas.offsetHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        let particleX = 0;
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            ctx.beginPath();
-            ctx.moveTo(0, height/2);
-            ctx.lineTo(width, height/2);
-            ctx.strokeStyle = "rgba(255, 77, 109, 0.3)";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(particleX, height/2, 3, 0, Math.PI * 2);
-            ctx.fillStyle = "#ff4d6d";
-            ctx.fill();
-            
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = "#ff4d6d";
-
-            particleX += 1;
-            if (particleX > width) particleX = 0;
-
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // --- 4. BG STARS ---
+        // STARS
         const starsContainer = document.getElementById('star-container');
         for(let i=0; i<50; i++) {
             let star = document.createElement('div');
@@ -422,6 +329,37 @@
             starsContainer.appendChild(star);
         }
 
+        // TIMER
+        const startDate = new Date("2025-10-21T00:00:00");
+        setInterval(() => {
+            const now = new Date();
+            const diff = now - startDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            document.getElementById('timer-display').innerText = `${days} Days, ${hours}h ${minutes}m ${seconds}s`;
+        }, 1000);
+
+        // CONSTELLATION LINE
+        const canvas = document.getElementById('constellation');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        function resize() { width = canvas.width = canvas.offsetWidth; height = canvas.height = canvas.offsetHeight; }
+        window.addEventListener('resize', resize); resize();
+        
+        let particleX = 0;
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath(); ctx.moveTo(0, height/2); ctx.lineTo(width, height/2);
+            ctx.strokeStyle = "rgba(255, 77, 109, 0.3)"; ctx.lineWidth = 1; ctx.stroke();
+            
+            ctx.beginPath(); ctx.arc(particleX, height/2, 3, 0, Math.PI*2);
+            ctx.fillStyle = "#ff4d6d"; ctx.fill();
+            particleX += 1; if (particleX > width) particleX = 0;
+            requestAnimationFrame(animate);
+        }
+        animate();
     </script>
 </body>
 </html>
