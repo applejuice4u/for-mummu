@@ -17,155 +17,127 @@
     <style>
         /* --- VARIABLES --- */
         :root {
-            --bg-color: radial-gradient(circle at bottom, #1b2735 0%, #090a0f 100%);
-            --text-color: white;
-            --accent-color: #ff4d6d;
-            --glow-color: rgba(255, 77, 109, 0.5);
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --lantern-color: #ffb74d;
+            --bg-dark: #0f0c29;
+            --bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #ff4d6d;
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
         }
 
         /* --- CORE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
+            background: var(--bg-gradient);
+            color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
-            padding-bottom: 50px;
+            padding-bottom: 100px; /* Space for cat & pulse */
         }
 
-        /* --- STARS --- */
+        /* --- BACKGROUND STARS --- */
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
         .star { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
 
-        /* --- HEADER --- */
-        header { text-align: center; padding: 40px 20px 20px; }
-        h1 { 
-            font-family: 'Dancing Script', cursive; font-size: 2.8rem; 
-            color: var(--accent-color); text-shadow: 0 0 15px var(--glow-color);
-            margin-bottom: 5px;
+        /* --- HEADER & TIMER --- */
+        header { text-align: center; padding: 30px 20px 10px; position: relative; }
+        .names-container { 
+            display: flex; justify-content: space-between; align-items: center; 
+            max-width: 350px; margin: 0 auto; font-weight: 600; letter-spacing: 2px;
+            font-size: 0.9rem; color: var(--accent);
         }
-        .subtitle { font-size: 0.8rem; opacity: 0.7; letter-spacing: 2px; text-transform: uppercase; }
+        .constellation-canvas {
+            position: absolute; top: 35px; left: 50%; transform: translateX(-50%);
+            width: 300px; height: 20px; z-index: 0; opacity: 0.5; pointer-events: none;
+        }
+        .infinite-timer { margin-top: 15px; }
+        .timer-label { font-family: 'Dancing Script', cursive; font-size: 1.2rem; opacity: 0.8; }
+        .timer-digits { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: bold; margin-top: 5px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
 
-        /* --- DASHBOARD --- */
-        .dashboard {
-            display: flex; flex-direction: column; gap: 20px;
-            max-width: 500px; margin: 0 auto; padding: 20px;
+        /* --- BENTO GRID LAYOUT --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr; /* Mobile default */
+            gap: 15px;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
         }
+        @media (min-width: 600px) {
+            .grid-container { grid-template-columns: 1fr 1fr; }
+            .span-2 { grid-column: span 2; }
+        }
+
+        /* --- GLASS CARDS --- */
         .card {
-            background: var(--card-bg); 
-            border: 1px solid var(--card-border);
-            border-radius: 24px; padding: 20px; 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            text-align: center; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-            position: relative; overflow: hidden;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
             transition: transform 0.2s;
         }
+        .card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
 
-        /* --- 1. LANTERN CONNECTION --- */
-        .lantern-card { height: 160px; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 0; padding-top: 30px;}
-        .lantern-text {
-            font-family: 'Dancing Script', cursive; font-size: 1.4rem; color: #ffe0b2;
-            text-shadow: 0 0 10px rgba(255, 224, 178, 0.5); z-index: 2;
+        /* --- 1. MOOD STATION --- */
+        .mood-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .mood-label { font-size: 0.7rem; margin-bottom: 5px; opacity: 0.8; }
+        .mood-btn {
+            background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+            width: 35px; height: 35px; cursor: pointer; font-size: 1.1rem;
+            transition: 0.2s;
         }
-        .water-surface {
-            width: 100%; height: 60px;
-            background: linear-gradient(to top, rgba(79, 172, 254, 0.2), transparent);
-            position: relative;
-            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
-            overflow: hidden;
-        }
-        .lantern {
-            position: absolute; bottom: -20px; width: 18px; height: 24px;
-            background: var(--lantern-color); border-radius: 4px;
-            box-shadow: 0 0 15px var(--lantern-color);
-            animation: floatLantern 8s linear infinite;
-            opacity: 0.9;
-        }
-        .lantern::after { content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 100%; background: var(--lantern-color); opacity: 0.4; transform: scaleY(-0.6); filter: blur(4px); }
-
-        /* --- 2. DUAL WEATHER WINDOWS --- */
-        .weather-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .weather-window {
-            background: rgba(0,0,0,0.2); border-radius: 18px; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; position: relative;
-            border: 1px solid rgba(255,255,255,0.05); min-height: 160px; justify-content: center;
-        }
-        .weather-cat-img { 
-            width: 110px; height: 110px; object-fit: contain; 
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); 
-            z-index: 2; transition: opacity 0.5s; 
-        }
-        .weather-info { font-size: 0.75rem; margin-top: 5px; opacity: 0.8; z-index: 2; font-weight: 600; }
-        .weather-label { font-size: 0.6rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 5px; letter-spacing: 1px; }
-
-        /* Weather FX */
-        .fx-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 18px; pointer-events: none; }
-        .rain-drop { position: absolute; width: 2px; height: 10px; background: rgba(135, 206, 235, 0.5); animation: rain 0.8s linear infinite; }
-        .sun-ray { position: absolute; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,200,0,0.1), transparent 60%); top: -50%; left: -50%; animation: spin 10s linear infinite; }
+        .mood-btn.active { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 10px var(--accent); }
         
-        /* --- 3. AFFIRMATION CAT (LOTTIE) --- */
-        .affirmation-card { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .affirmation-text { font-family: 'Dancing Script', cursive; font-size: 1.6rem; color: var(--accent-color); margin-top: 10px; }
+        /* --- 2. MEMORY BOX --- */
+        .memory-text { font-style: italic; font-size: 0.95rem; line-height: 1.5; min-height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .shuffle-btn { background: transparent; border: 1px solid var(--text-dim); color: var(--text-dim); padding: 5px 10px; border-radius: 15px; font-size: 0.7rem; cursor: pointer; }
 
-        /* --- 4. OVERFLOWING HEART --- */
-        .meter-card { padding: 30px; cursor: pointer; }
-        .meter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .meter-title { font-weight: bold; font-size: 1rem; }
-        .meter-count { font-size: 0.8rem; opacity: 0.7; font-family: monospace; }
+        /* --- 3. FOCUS TRACKER --- */
+        .focus-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .focus-item:last-child { border-bottom: none; }
+        .focus-who { font-size: 0.7rem; color: var(--accent); font-weight: bold; }
+        .focus-what { font-size: 0.9rem; margin: 2px 0; }
+        .focus-days { font-size: 0.75rem; opacity: 0.6; text-align: right; }
+
+        /* --- 4. VISITOR LOG --- */
+        .visit-count { font-size: 2rem; font-weight: bold; color: white; text-align: center; }
+        .visit-sub { font-size: 0.7rem; text-align: center; opacity: 0.6; }
+
+        /* --- 5. TIMELINE --- */
+        .timeline-scroll { max-height: 120px; overflow-y: auto; padding-right: 5px; }
+        .timeline-event { display: flex; gap: 10px; margin-bottom: 12px; }
+        .event-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+        .event-content h4 { font-size: 0.85rem; font-weight: 600; }
+        .event-content p { font-size: 0.75rem; opacity: 0.6; }
+
+        /* --- BOTTOM CORNER ELEMENTS --- */
         
-        .heart-container {
-            width: 100px; height: 90px; margin: 0 auto; position: relative;
-            filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.4));
+        /* Pulse (Right) */
+        .pulse-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 100;
         }
-        .heart-bg { fill: rgba(255,255,255,0.1); }
-        .heart-liquid { fill: var(--accent-color); transition: y 0.5s ease; }
+        .pulse-btn {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(255, 77, 109, 0.2); border: 2px solid var(--accent);
+            color: var(--accent); font-size: 1.5rem; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 77, 109, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        .pulse-btn:active { transform: scale(0.9); background: var(--accent); color: white; }
 
-        /* --- 5. BOTTLE --- */
-        .bottle-card { min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 0; overflow: visible;}
-        .sand-bg {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
-            background: linear-gradient(to top, #d4a373 0%, #fae1dd 100%);
-            border-radius: 0 0 24px 24px; opacity: 0.8; z-index: 0;
-        }
-        .bottle-visual { 
-            font-size: 4rem; margin: 0 auto 10px; z-index: 2; 
-            transform: rotate(-10deg) translateY(10px); 
-            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.3));
-            transition: transform 0.5s;
-        }
-        .bottle-visual.sent { transform: rotate(10deg) translateY(-50px) scale(0.8); opacity: 0; }
-        
-        .message-input-area { z-index: 5; margin-bottom: 20px; display: flex; gap: 10px; width: 100%; }
-        .glass-input {
-            flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 15px; border-radius: 50px; color: white; outline: none; font-size: 0.9rem;
-        }
-        .glass-btn {
-            background: var(--accent-color); border: none; width: 40px; height: 40px;
-            border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 10px var(--accent-color);
+        /* Cat (Left) */
+        .cat-container {
+            position: fixed; bottom: 10px; left: 10px; z-index: 100;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+            pointer-events: none; /* Let clicks pass through if needed */
         }
 
-        /* --- 6. TOUCH BUTTON --- */
-        .touch-container { display: flex; align-items: center; justify-content: space-between; }
-        .touch-btn {
-            width: 60px; height: 60px; border-radius: 50%; border: none;
-            background: rgba(255, 77, 109, 0.1); border: 2px solid var(--accent-color);
-            color: var(--accent-color); font-size: 1.5rem; cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 77, 109, 0.2); position: relative; overflow: hidden;
-        }
-        .touch-btn:active { transform: scale(0.95); background: var(--accent-color); color: white; }
-
-        /* --- ANIMATIONS --- */
-        @keyframes floatLantern { 0% { transform: translate(0, 20px) scale(0.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(100px, -100px) scale(1); opacity: 0; } }
-        @keyframes rain { to { transform: translateY(150px); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ANIMATIONS */
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-        
         .heart-particle { position: fixed; bottom: -50px; font-size: 24px; animation: floatUp 3s linear forwards; z-index: 999; pointer-events: none; }
         @keyframes floatUp { to { transform: translateY(-110vh) scale(1.2); opacity: 0; } }
 
@@ -176,85 +148,115 @@
     <div class="stars" id="star-container"></div>
 
     <header>
-        <h1>Mummuu's Dashboard</h1>
-        <div class="subtitle">Beta 4.0 • Deep Love</div>
+        <div class="names-container">
+            <span>BUBU</span>
+            <span>MUMU</span>
+        </div>
+        <canvas class="constellation-canvas" id="constellation"></canvas>
+
+        <div class="infinite-timer">
+            <div class="timer-label">Loving each other for...</div>
+            <div class="timer-digits" id="timer-display">Loading timeline...</div>
+        </div>
     </header>
 
-    <div class="dashboard">
+    <div class="grid-container">
 
-        <div class="card lantern-card">
-            <div class="lantern-text">"My love always finds its way home."</div>
-            <div class="water-surface" id="lantern-container"></div>
-        </div>
-
-        <div class="weather-row">
-            <div class="weather-window">
-                <div class="weather-label">BUBU (INDIA)</div>
-                <div class="fx-layer" id="fx-india"></div>
-                <img src="grey-cloud.webp" class="weather-cat-img" id="img-india">
-                <div class="weather-info" id="info-india">Loading...</div>
-            </div>
-            <div class="weather-window">
-                <div class="weather-label">SAYANG (INDO)</div>
-                <div class="fx-layer" id="fx-indo"></div>
-                <img src="white-cloud.webp" class="weather-cat-img" id="img-indo">
-                <div class="weather-info" id="info-indo">Loading...</div>
-            </div>
-        </div>
-
-        <div class="card affirmation-card">
-            <lottie-player 
-                src="cat.json" 
-                background="transparent" 
-                speed="1"  
-                style="width: 150px; height: 150px;" 
-                loop autoplay>
-            </lottie-player>
-            <div class="affirmation-text">Does Bubu love you?</div>
-        </div>
-
-        <div class="card meter-card" id="missYouBtn">
-            <div class="meter-header">
-                <div class="meter-title">Miss You Meter</div>
-                <div class="meter-count" id="miss-total">Total: 0</div>
-            </div>
+        <div class="card span-2">
+            <div class="card-title">Mood Station</div>
             
-            <div class="heart-container">
-                <svg viewBox="0 0 100 90" width="100" height="90">
-                    <defs>
-                        <mask id="heartMask">
-                            <path d="M50,88 C10,65 0,35 0,22 C0,10 10,0 25,0 C38,0 45,10 50,18 C55,10 62,0 75,0 C90,0 100,10 100,22 C100,35 90,65 50,88 Z" fill="white"/>
-                        </mask>
-                    </defs>
-                    <rect x="0" y="0" width="100" height="90" class="heart-bg" mask="url(#heartMask)" />
-                    <rect x="0" y="90" width="100" height="90" class="heart-liquid" id="liquid-bar" mask="url(#heartMask)" />
-                </svg>
-            </div>
-            <div style="font-size: 0.7rem; opacity: 0.5; margin-top: 10px;">Tap to fill Bubu's heart</div>
-        </div>
-
-        <div class="card bottle-card">
-            <div class="bottle-visual" id="bottle-visual">🍾</div> 
-            <div class="sand-bg"></div>
-            
-            <div style="font-size: 0.9rem; font-style: italic; opacity: 0.8; margin-bottom: 15px; z-index: 2;" id="last-bottle-msg">
-                "Checking the tides..."
+            <div class="mood-label">Bubu is feeling:</div>
+            <div class="mood-row" id="mood-albin">
+                <button class="mood-btn" onclick="setMood('albin', '😊')">😊</button>
+                <button class="mood-btn" onclick="setMood('albin', '😔')">😔</button>
+                <button class="mood-btn" onclick="setMood('albin', '😴')">😴</button>
+                <button class="mood-btn" onclick="setMood('albin', '❤️')">❤️</button>
             </div>
 
-            <div class="message-input-area">
-                <input type="text" id="bottleInput" class="glass-input" placeholder="Write a secret note..." maxlength="50">
-                <button class="glass-btn" id="sendBottleBtn">➤</button>
+            <div class="mood-label" style="margin-top: 10px;">Mumu is feeling:</div>
+            <div class="mood-row" id="mood-taa">
+                <button class="mood-btn" onclick="setMood('taa', '😊')">😊</button>
+                <button class="mood-btn" onclick="setMood('taa', '😔')">😔</button>
+                <button class="mood-btn" onclick="setMood('taa', '😴')">😴</button>
+                <button class="mood-btn" onclick="setMood('taa', '❤️')">❤️</button>
             </div>
         </div>
 
-        <div class="card touch-container">
-            <div style="text-align: left;">
-                <div style="font-weight: bold;">Virtual Touch</div>
-                <div style="font-size: 0.7rem; opacity: 0.6;">Hold to send a river of love</div>
+        <div class="card">
+            <div class="card-title">
+                <span>Memory Box</span>
+                <button class="shuffle-btn" id="shuffleBtn">Shuffle ↻</button>
             </div>
-            <button class="touch-btn" id="touchBtn">❤️</button>
+            <div class="memory-text" id="memory-display">
+                "Click shuffle to remember a moment..."
+            </div>
         </div>
 
+        <div class="card">
+            <div class="card-title">Daily Connection</div>
+            <div class="visit-count" id="visit-count">0</div>
+            <div class="visit-sub">Shared visits today</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Current Focus</div>
+            <div class="focus-item">
+                <div class="focus-who">BUBU'S MISSION</div>
+                <div class="focus-what" contenteditable="true" id="focus-albin-text">Solids Exam</div>
+                <div class="focus-days" id="focus-albin-days">Calculating...</div>
+            </div>
+            <div class="focus-item">
+                <div class="focus-who">MUMU'S MISSION</div>
+                <div class="focus-what" contenteditable="true" id="focus-taa-text">Project Submission</div>
+                <div class="focus-days" id="focus-taa-days">Calculating...</div>
+            </div>
+        </div>
+
+        <div class="card span-2">
+            <div class="card-title">Our Story</div>
+            <div class="timeline-scroll">
+                <div class="timeline-event">
+                    <div class="event-dot"></div>
+                    <div class="event-content">
+                        <h4>Oct 21, 2025</h4>
+                        <p>The day it all began. ❤️</p>
+                    </div>
+                </div>
+                <div class="timeline-event">
+                    <div class="event-dot"></div>
+                    <div class="event-content">
+                        <h4>Nov 05, 2025</h4>
+                        <p>First "I miss you".</p>
+                    </div>
+                </div>
+                <div class="timeline-event">
+                    <div class="event-dot"></div>
+                    <div class="event-content">
+                        <h4>Dec 25, 2025</h4>
+                        <p>Our first Christmas call.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card span-2" style="padding: 10px;">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+    </div>
+
+    <div class="cat-container">
+        <lottie-player 
+            src="cat.json" 
+            background="transparent" 
+            speed="1" 
+            style="width: 120px; height: 120px;" 
+            loop autoplay>
+        </lottie-player>
+    </div>
+
+    <div class="pulse-container">
+        <button class="pulse-btn" id="pulseBtn">❤️</button>
     </div>
 
     <script type="module">
@@ -275,109 +277,141 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- 1. OVERFLOWING HEART ---
-        const missBtn = document.getElementById('missYouBtn');
-        const liquidBar = document.getElementById('liquid-bar');
-        const missTotal = document.getElementById('miss-total');
-        let localClickCount = 0;
+        // --- GLOBAL FUNCTIONS ---
+        window.setMood = function(person, mood) {
+            set(ref(db, `moods/${person}`), mood);
+        }
 
-        onValue(ref(db, 'missYou/count'), (snapshot) => {
-            const total = snapshot.val() || 0;
-            missTotal.innerText = `Total Misses: ${total}`;
+        // --- 1. MOOD SYNC ---
+        onValue(ref(db, 'moods'), (snapshot) => {
+            const data = snapshot.val() || {};
+            // Update Bubu (Albin)
+            document.querySelectorAll('#mood-albin .mood-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === data.albin);
+            });
+            // Update Mumu (Taa)
+            document.querySelectorAll('#mood-taa .mood-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === data.taa);
+            });
         });
 
-        missBtn.addEventListener('click', () => {
-            runTransaction(ref(db, 'missYou/count'), (count) => (count || 0) + 1);
-            
-            localClickCount += 10;
-            if (localClickCount > 100) {
-                confetti({
-                    particleCount: 150, spread: 80, origin: { y: 0.6 },
-                    colors: ['#ff4d6d', '#ffffff']
-                });
-                localClickCount = 0;
-            }
-            
-            const yValue = 90 - (90 * (localClickCount / 100));
-            liquidBar.setAttribute('y', yValue);
+        // --- 2. MEMORY BOX ---
+        const memories = [
+            "That time you fell asleep on the call...",
+            "When we watched that Batman movie together.",
+            "The first time you said my name.",
+            "When we planned our dream house.",
+            "Laughing at 2 AM about nothing.",
+            "The way you smile when you see me."
+        ];
+        
+        document.getElementById('shuffleBtn').addEventListener('click', () => {
+            const random = memories[Math.floor(Math.random() * memories.length)];
+            document.getElementById('memory-display').innerText = `"${random}"`;
         });
 
-        // --- 2. TOUCH BUTTON ---
-        const touchBtn = document.getElementById('touchBtn');
-        let touchInterval;
+        // --- 3. DAILY VISITOR LOG ---
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const visitRef = ref(db, `visits/${todayStr}`);
+        
+        if(!sessionStorage.getItem('visited')) {
+            runTransaction(visitRef, (count) => (count || 0) + 1);
+            sessionStorage.setItem('visited', 'true');
+        }
+        onValue(visitRef, (snapshot) => {
+            document.getElementById('visit-count').innerText = snapshot.val() || 0;
+        });
 
-        const startRiver = () => {
+        // --- 4. PULSE ---
+        const pulseBtn = document.getElementById("pulseBtn");
+        pulseBtn.addEventListener("click", () => {
             set(ref(db, 'heartbeats/lastPulse'), Date.now());
-            touchInterval = setInterval(() => {
-                set(ref(db, 'heartbeats/lastPulse'), Date.now());
-            }, 300);
-        };
-        const stopRiver = () => { clearInterval(touchInterval); };
-
-        touchBtn.addEventListener('mousedown', startRiver);
-        touchBtn.addEventListener('mouseup', stopRiver);
-        touchBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startRiver(); });
-        touchBtn.addEventListener('touchend', stopRiver);
-
-        onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
-            if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
-                createHeartRain();
-            }
-        });
-
-        // --- 3. BOTTLE ---
-        const bInput = document.getElementById('bottleInput');
-        const bBtn = document.getElementById('sendBottleBtn');
-        const bDisplay = document.getElementById('last-bottle-msg');
-        const bVisual = document.getElementById('bottle-visual');
-
-        bBtn.addEventListener('click', () => {
-            if(bInput.value.trim()) {
-                push(ref(db, 'bottles'), { text: bInput.value, time: Date.now() });
-                bInput.value = "";
-                bVisual.classList.add('sent');
-                setTimeout(() => bVisual.classList.remove('sent'), 1000);
-            }
         });
         
-        const bottleQuery = query(ref(db, 'bottles'), limitToLast(1));
-        onValue(bottleQuery, (snapshot) => {
-            if(snapshot.exists()) {
-                const data = snapshot.val();
-                const msg = Object.values(data)[0].text;
-                bDisplay.innerText = `"${msg}"`;
+        onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
+            if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
+                confetti({
+                    particleCount: 50, spread: 60, origin: { y: 0.9 },
+                    colors: ['#ff4d6d', '#ffffff'],
+                    ticks: 200
+                });
             }
         });
 
-        function createHeartRain() {
-            for (let i = 0; i < 5; i++) {
-                const heart = document.createElement('div');
-                heart.classList.add('heart-particle');
-                heart.innerHTML = '❤️';
-                heart.style.left = Math.random() * 100 + "vw";
-                heart.style.animationDuration = (Math.random() * 1 + 2) + "s";
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 3000);
-            }
-        }
     </script>
 
     <script>
-        // LANTERNS
-        const lanternContainer = document.getElementById('lantern-container');
-        function spawnLantern() {
-            const l = document.createElement('div');
-            l.className = 'lantern';
-            l.style.left = (Math.random() * 80) + "%"; 
-            l.style.animationDuration = (Math.random() * 3 + 6) + "s";
-            lanternContainer.appendChild(l);
-            setTimeout(() => l.remove(), 9000);
-        }
-        setInterval(spawnLantern, 1500);
+        // --- 1. INFINITE TIMER ---
+        const startDate = new Date("2025-10-21T00:00:00");
 
-        // STARS
+        function updateTimer() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('timer-display').innerText = 
+                `${days} Days, ${hours}h ${minutes}m ${seconds}s`;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // --- 2. FOCUS TRACKER ---
+        const albinExam = new Date("2026-01-20");
+        const taaProject = new Date("2026-01-15");
+
+        function getDaysLeft(target) {
+            const diff = target - new Date();
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            return days > 0 ? `${days} days left` : "Done!";
+        }
+        document.getElementById('focus-albin-days').innerText = getDaysLeft(albinExam);
+        document.getElementById('focus-taa-days').innerText = getDaysLeft(taaProject);
+
+        // --- 3. CONSTELLATION CANVAS ---
+        const canvas = document.getElementById('constellation');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function resize() {
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let particleX = 0;
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            ctx.beginPath();
+            ctx.moveTo(0, height/2);
+            ctx.lineTo(width, height/2);
+            ctx.strokeStyle = "rgba(255, 77, 109, 0.3)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(particleX, height/2, 3, 0, Math.PI * 2);
+            ctx.fillStyle = "#ff4d6d";
+            ctx.fill();
+            
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#ff4d6d";
+
+            particleX += 1;
+            if (particleX > width) particleX = 0;
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 4. BG STARS ---
         const starsContainer = document.getElementById('star-container');
-        for(let i=0; i<60; i++) {
+        for(let i=0; i<50; i++) {
             let star = document.createElement('div');
             star.className = 'star';
             star.style.left = Math.random() * 100 + '%';
@@ -387,59 +421,6 @@
             star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
             starsContainer.appendChild(star);
         }
-
-        // --- DUAL WEATHER ENGINE ---
-        async function fetchWeather(lat, lon, imgId, infoId, fxId, isNightTime, catColor) {
-            try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                const data = await res.json();
-                const code = data.current_weather.weathercode;
-                const temp = data.current_weather.temperature;
-                
-                const imgEl = document.getElementById(imgId);
-                const infoEl = document.getElementById(infoId);
-                const fxEl = document.getElementById(fxId);
-                
-                infoEl.innerText = `${temp}°C`;
-                fxEl.innerHTML = ""; // Clear FX
-
-                // LOGIC: Swap sticker based on code and Cat Color (grey/white)
-                if (code <= 1) {
-                    if (isNightTime) {
-                        imgEl.src = `${catColor}-night.webp`;
-                    } else {
-                        imgEl.src = `${catColor}-sun.webp`;
-                        fxEl.innerHTML = '<div class="sun-ray"></div>';
-                    }
-                } else if (code <= 3) {
-                    imgEl.src = `${catColor}-cloud.webp`;
-                } else if (code >= 50) {
-                    imgEl.src = `${catColor}-rain.webp`;
-                    for(let i=0; i<10; i++) {
-                        let d = document.createElement('div'); d.className='rain-drop';
-                        d.style.left = Math.random()*100+"%"; d.style.animationDelay=Math.random()+'s';
-                        fxEl.appendChild(d);
-                    }
-                }
-            } catch(e) { console.log("Weather error"); }
-        }
-
-        function updateAllWeather() {
-            const indiaHour = new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata", hour: 'numeric', hour12: false});
-            const indoHour = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta", hour: 'numeric', hour12: false});
-            
-            const indiaNight = indiaHour >= 18 || indiaHour < 6;
-            const indoNight = indoHour >= 18 || indoHour < 6;
-
-            // Fetch India (Grey Cat)
-            fetchWeather(10.52, 76.21, 'img-india', 'info-india', 'fx-india', indiaNight, 'grey');
-            
-            // Fetch Indo (White Cat)
-            fetchWeather(3.59, 98.67, 'img-indo', 'info-indo', 'fx-indo', indoNight, 'white');
-        }
-        
-        updateAllWeather();
-        setInterval(updateAllWeather, 600000); // 10 mins
 
     </script>
 </body>
