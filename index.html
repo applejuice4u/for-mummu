@@ -2,201 +2,281 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mummuu's Dashboard</title>
-    <link rel="icon" type="image/png" href="icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mumu & Bubu App</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"> <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
-        /* --- VARIABLES --- */
         :root {
-            --bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --accent: #ff4d6d;
-            --text-main: #ffffff;
+            --bg-dark: #1a1a2e;
+            --bg-gradient: linear-gradient(to bottom, #2b102b, #1a1a2e); /* Purple/Dark Pink Hue */
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --accent: #ff9a9e; /* Sakura Pink */
+            --accent-glow: rgba(255, 154, 158, 0.5);
+            --text: #fff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 100px;
-        }
-
-        /* --- IDENTITY MODAL --- */
-        .identity-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .identity-box {
-            background: #1a1a2e; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--accent);
-        }
-        .id-btn {
-            padding: 10px 20px; margin: 10px; font-size: 1.2rem; border-radius: 10px; border: none; cursor: pointer;
-            background: rgba(255,255,255,0.1); color: white; transition: 0.3s;
-        }
-        .id-btn:hover { background: var(--accent); }
-
-        /* --- HEADER --- */
-        header { text-align: center; padding: 30px 20px 10px; position: relative; }
-        .names-container { 
-            display: flex; justify-content: space-between; align-items: center; 
-            max-width: 350px; margin: 0 auto; 
-            /* NEW FONT HERE */
-            font-family: 'Pacifico', cursive; 
-            font-size: 1.5rem; color: var(--accent);
-            text-shadow: 0 0 10px rgba(255, 77, 109, 0.6);
-        }
-        .constellation-canvas {
-            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
-            width: 300px; height: 20px; opacity: 0.5; pointer-events: none;
-        }
-        .infinite-timer { margin-top: 20px; }
-        .timer-digits { font-family: 'Courier New', monospace; font-size: 1rem; opacity: 0.8; }
-
-        /* --- GRID --- */
-        .grid-container {
-            display: grid; grid-template-columns: 1fr; gap: 15px;
-            max-width: 600px; margin: 20px auto; padding: 0 15px;
-        }
-        @media (min-width: 600px) { .grid-container { grid-template-columns: 1fr 1fr; } .span-2 { grid-column: span 2; } }
-
-        .card {
-            background: var(--glass-bg); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
-        }
-        .card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-bottom: 15px; }
-
-        /* --- MOOD --- */
-        .mood-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .mood-btn {
-            background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
-            width: 35px; height: 35px; cursor: pointer; font-size: 1.1rem; transition: 0.2s;
-        }
-        .mood-btn.active { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 10px var(--accent); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* LOCKED STATE (Greyed out) */
-        .locked-row { opacity: 0.3; pointer-events: none; filter: grayscale(100%); }
-
-        /* --- FOCUS --- */
-        .focus-item { margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
-        .focus-who { font-size: 0.7rem; color: var(--accent); font-weight: bold; }
-        .focus-what { font-size: 1rem; font-weight: 600; }
-        .focus-days { font-size: 0.8rem; opacity: 0.7; }
-
-        /* --- TIMELINE --- */
-        .timeline-scroll { max-height: 150px; overflow-y: auto; }
-        .timeline-event { display: flex; gap: 10px; margin-bottom: 15px; }
-        .event-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
-        .event-date { font-size: 0.8rem; font-weight: bold; color: var(--accent); }
-        .event-desc { font-size: 0.8rem; opacity: 0.8; }
-
-        /* --- CORNER ELEMENTS --- */
-        .pulse-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
-        .pulse-btn {
-            width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 77, 109, 0.2); 
-            border: 2px solid var(--accent); color: var(--accent); font-size: 1.5rem; cursor: pointer;
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden; /* App feel */
+            display: flex; flex-direction: column;
         }
-        .cat-container { position: fixed; bottom: 10px; left: 10px; z-index: 100; pointer-events: none; }
-        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: twinkle var(--duration) infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* --- SAKURA BACKGROUND --- */
+        .sakura-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .petal {
+            position: absolute; background: #ffc3a0; opacity: 0.6;
+            border-radius: 100% 0 100% 0;
+            animation: fall var(--fall-duration) linear infinite, sway var(--sway-duration) ease-in-out infinite alternate;
+        }
+
+        /* --- HEADER (Avatars & Songs) --- */
+        .app-header {
+            padding: 40px 20px 10px; z-index: 10;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+        .profile-section { position: relative; width: 80px; display: flex; flex-direction: column; align-items: center; }
+        
+        .avatar-ring {
+            width: 60px; height: 60px; border-radius: 50%;
+            border: 3px solid var(--accent);
+            padding: 3px; position: relative;
+            background: var(--glass);
+        }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #333; }
+        
+        .status-dot {
+            position: absolute; bottom: 0; right: 0; width: 15px; height: 15px;
+            background: #2ecc71; border-radius: 50%; border: 2px solid #1a1a2e;
+        }
+
+        /* Song Bubble */
+        .song-bubble {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            background: white; color: #333; padding: 5px 10px;
+            border-radius: 15px; font-size: 0.7rem; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: floatBubble 3s ease-in-out infinite;
+            cursor: pointer; max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+        }
+        .song-bubble::after {
+            content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+            border-width: 5px; border-style: solid; border-color: white transparent transparent transparent;
+        }
+
+        /* --- MAIN CONTENT AREA (Tabs) --- */
+        .content-area {
+            flex: 1; position: relative; overflow-y: auto; overflow-x: hidden;
+            padding: 20px; padding-bottom: 90px; z-index: 5;
+        }
+        
+        .tab-view { display: none; animation: fadeIn 0.3s ease; height: 100%; }
+        .tab-view.active { display: block; }
+
+        /* --- TAB 1: HOME (Heart & Mood) --- */
+        .home-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 30px; }
+        
+        .heart-wrapper { position: relative; width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; }
+        .big-heart {
+            font-size: 8rem; color: var(--accent);
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+            transition: transform 0.1s; cursor: pointer; user-select: none;
+        }
+        .big-heart:active { transform: scale(0.9); }
+        .pulse-ring {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border: 2px solid var(--accent); opacity: 0;
+            animation: ripple 2s infinite;
+        }
+
+        .mood-slider-container { width: 100%; background: var(--glass); padding: 20px; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border); }
+        .mood-slider { width: 100%; -webkit-appearance: none; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; outline: none; margin: 15px 0; }
+        .mood-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 25px; height: 25px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+        /* --- TAB 2: CALENDAR --- */
+        .calendar-card { background: var(--glass); border-radius: 20px; padding: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
+        .calendar-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: var(--accent); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-size: 0.8rem; }
+        .cal-day { padding: 8px; border-radius: 8px; opacity: 0.8; }
+        .cal-day.today { background: var(--accent); color: white; font-weight: bold; opacity: 1; }
+        .cal-day.event { border: 1px solid var(--accent); color: var(--accent); }
+
+        .mission-list { margin-top: 10px; }
+        .mission-item { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; margin-bottom: 8px; }
+        .mission-icon { color: var(--accent); }
+
+        /* --- TAB 3: MEMORIES --- */
+        .timeline { border-left: 2px solid var(--glass-border); padding-left: 20px; margin-left: 10px; }
+        .memory-card { background: var(--glass); padding: 15px; border-radius: 15px; margin-bottom: 20px; position: relative; border: 1px solid var(--glass-border); }
+        .memory-card::before { content: '🌸'; position: absolute; left: -29px; top: 10px; font-size: 1.2rem; }
+        .mem-date { font-size: 0.7rem; opacity: 0.7; margin-bottom: 5px; text-transform: uppercase; }
+        .mem-text { font-style: italic; font-size: 0.95rem; }
+
+        /* --- CAT POSITIONS --- */
+        .cat-corner { position: absolute; bottom: 80px; right: -20px; z-index: 4; pointer-events: none; opacity: 0.9; }
+        .cat-calendar { margin: 0 auto; display: block; opacity: 0.8; }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid var(--glass-border);
+            height: 70px; border-radius: 35px;
+            display: flex; justify-content: space-around; align-items: center;
+            backdrop-filter: blur(15px); z-index: 50;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .nav-item { color: rgba(255,255,255,0.4); font-size: 1.5rem; transition: 0.3s; cursor: pointer; position: relative; }
+        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
+
+        /* --- ADMIN MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: #2b102b; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid var(--accent); }
+        .modal-box input, .modal-box textarea { width: 100%; padding: 10px; margin: 10px 0; background: rgba(0,0,0,0.3); border: 1px solid #555; color: white; border-radius: 8px; }
+        .btn { background: var(--accent); border: none; padding: 10px 20px; color: white; border-radius: 10px; font-weight: bold; width: 100%; margin-top: 10px; }
+
+        /* ANIMATIONS */
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+        @keyframes sway { from { margin-left: -20px; } to { margin-left: 20px; } }
+        @keyframes floatBubble { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -5px); } }
+        @keyframes ripple { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
 <body>
 
-    <div id="identity-modal" class="identity-overlay" style="display:none;">
-        <div class="identity-box">
-            <h2 style="margin-bottom:20px;">Who is this?</h2>
-            <button class="id-btn" onclick="setIdentity('bubu')">🐻 Bubu</button>
-            <button class="id-btn" onclick="setIdentity('mumu')">🐱 Mumu</button>
-        </div>
-    </div>
+    <div class="sakura-container" id="sakura-bg"></div>
 
-    <div class="stars" id="star-container"></div>
-
-    <header>
-        <div class="names-container">
-            <span>BUBU</span>
-            <span>MUMU</span>
+    <header class="app-header">
+        <div class="profile-section">
+            <div class="song-bubble" id="song-bubu" onclick="playSong('bubu')">🎵 Loading...</div>
+            <div class="avatar-ring">
+                <img src="pet-albin.webp" class="avatar-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616408.png'">
+                <div class="status-dot"></div>
+            </div>
         </div>
-        <canvas class="constellation-canvas" id="constellation"></canvas>
-        <div class="infinite-timer">
-            <div class="timer-digits" id="timer-display">Loading love...</div>
+        
+        <div style="text-align: center; color: var(--accent); font-family: 'Dancing Script', cursive; font-size: 1.8rem;" id="app-title">
+            Bubu & Mumu
+        </div>
+
+        <div class="profile-section">
+            <div class="song-bubble" id="song-mumu" onclick="playSong('mumu')">🎵 Loading...</div>
+            <div class="avatar-ring">
+                <img src="pet-taa.webp" class="avatar-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616430.png'">
+                <div class="status-dot"></div>
+            </div>
         </div>
     </header>
 
-    <div class="grid-container">
+    <div class="content-area">
 
-        <div class="card span-2">
-            <div class="card-title">Mood Station</div>
+        <div id="tab-home" class="tab-view active">
+            <div class="home-container">
+                <div style="text-align: center;">
+                    <h2 style="font-weight: 400; font-size: 1.2rem; opacity: 0.8;">Tap to send love</h2>
+                    <div class="heart-wrapper" id="heart-btn">
+                        <div class="pulse-ring"></div>
+                        <div class="big-heart">❤️</div>
+                    </div>
+                </div>
+
+                <div class="mood-slider-container">
+                    <h3 style="font-size: 1rem; margin-bottom: 5px;">How is your energy?</h3>
+                    <input type="range" min="0" max="100" value="50" class="mood-slider" id="my-energy" onchange="updateEnergy()">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.7;">
+                        <span>😴 Low</span>
+                        <span>⚡ High</span>
+                    </div>
+                    <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; font-size: 0.9rem;">
+                        Partner's Energy: <span id="partner-energy" style="color: var(--accent); font-weight: bold;">Loading...</span>
+                    </div>
+                </div>
+            </div>
             
-            <div style="font-size:0.7rem; margin-bottom:5px;">Bubu is feeling:</div>
-            <div class="mood-row" id="mood-row-bubu">
-                <button class="mood-btn" onclick="setMood('bubu', '😊')">😊</button>
-                <button class="mood-btn" onclick="setMood('bubu', '😔')">😔</button>
-                <button class="mood-btn" onclick="setMood('bubu', '😴')">😴</button>
-                <button class="mood-btn" onclick="setMood('bubu', '❤️')">❤️</button>
-            </div>
-
-            <div style="font-size:0.7rem; margin-bottom:5px;">Mumu is feeling:</div>
-            <div class="mood-row" id="mood-row-mumu">
-                <button class="mood-btn" onclick="setMood('mumu', '😊')">😊</button>
-                <button class="mood-btn" onclick="setMood('mumu', '😔')">😔</button>
-                <button class="mood-btn" onclick="setMood('mumu', '😴')">😴</button>
-                <button class="mood-btn" onclick="setMood('mumu', '❤️')">❤️</button>
+            <div class="cat-corner">
+                <lottie-player src="cat.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title">Current Focus</div>
-            <div class="focus-item">
-                <div class="focus-who">BUBU'S MISSION</div>
-                <div class="focus-what" id="focus-bubu-text">...</div>
-                <div class="focus-days" id="focus-bubu-days">...</div>
+        <div id="tab-calendar" class="tab-view">
+            <h2 style="margin-bottom: 20px;">📅 Our Planner</h2>
+            
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <span id="month-display">January 2026</span>
+                </div>
+                <div class="calendar-grid" id="cal-grid">
+                    </div>
             </div>
-            <div class="focus-item">
-                <div class="focus-who">MUMU'S MISSION</div>
-                <div class="focus-what" id="focus-mumu-text">...</div>
-                <div class="focus-days" id="focus-mumu-days">...</div>
+
+            <h3 style="margin: 20px 0 10px;">Upcoming Missions</h3>
+            <div class="mission-list" id="mission-list">
+                <div class="mission-item">
+                    <i class="fas fa-spinner fa-spin mission-icon"></i> Loading missions...
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; justify-content: center;">
+                <lottie-player src="cat.json" background="transparent" speed="0.5" style="width: 100px; height: 100px; opacity: 0.6;" loop autoplay></lottie-player>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title">Our Story</div>
-            <div class="timeline-scroll" id="timeline-container">
+        <div id="tab-memories" class="tab-view">
+            <h2 style="margin-bottom: 20px;">🌸 Memory Lane</h2>
+            <div class="timeline" id="timeline-container">
                 </div>
         </div>
-        
-        <div class="card">
-            <div class="card-title">
-                <span>Memory Box</span>
-                <button onclick="shuffleMemory()" style="background:none; border:1px solid #fff; color:#fff; border-radius:10px; padding:2px 8px; cursor:pointer;">↻</button>
+
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item" onclick="switchTab('calendar')"><i class="fas fa-calendar-alt"></i></div>
+        <div class="nav-item active" onclick="switchTab('home')"><i class="fas fa-heart"></i></div>
+        <div class="nav-item" onclick="switchTab('memories')"><i class="fas fa-images"></i></div>
+    </nav>
+
+    <div class="modal-overlay" id="admin-modal">
+        <div class="modal-box">
+            <h3 style="text-align: center; color: var(--accent);">🛠️ Admin Panel</h3>
+            
+            <label>My Song (Spotify Link or Name):</label>
+            <input type="text" id="admin-song" placeholder="Song Name...">
+            
+            <label>Add Mission (YYYY-MM-DD):</label>
+            <div style="display: flex; gap: 5px;">
+                <input type="date" id="admin-date">
+                <input type="text" id="admin-mission" placeholder="Mission Name">
             </div>
-            <div id="memory-text" style="font-style:italic; min-height:50px; display:flex; align-items:center; justify-content:center;">
-                "Loading memories..."
-            </div>
+            <button class="btn" onclick="addMission()">Save Mission</button>
+
+            <label style="margin-top: 15px;">Add Memory:</label>
+            <textarea id="admin-memory" rows="2" placeholder="Describe a moment..."></textarea>
+            <button class="btn" onclick="addMemory()">Save Memory</button>
+
+            <button class="btn" style="background: #555; margin-top: 20px;" onclick="closeAdmin()">Close</button>
         </div>
-
-    </div>
-
-    <div class="cat-container">
-        <lottie-player src="cat.json" background="transparent" speed="1" style="width: 120px; height: 120px;" loop autoplay></lottie-player>
-    </div>
-    <div class="pulse-container">
-        <button class="pulse-btn" id="pulseBtn">❤️</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBznon9j3zMoqT24mWZci29cfGGw41bT-U",
@@ -211,155 +291,176 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- IDENTITY SYSTEM ---
-        const modal = document.getElementById('identity-modal');
-        const userRole = localStorage.getItem('user_role');
+        // --- IDENTITY (Simple LocalStorage) ---
+        let identity = localStorage.getItem('role') || 'bubu'; // Default to Bubu if unknown
+        // A simple way to switch for testing: URL param ?role=mumu
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('role')) { identity = urlParams.get('role'); localStorage.setItem('role', identity); }
+        const partner = identity === 'bubu' ? 'mumu' : 'bubu';
 
-        if (!userRole) {
-            modal.style.display = 'flex'; // Show if no role saved
-        } else {
-            applyLocks(userRole);
-        }
+        // --- 1. HEARTBEAT ---
+        const heartBtn = document.getElementById('heart-btn');
+        heartBtn.addEventListener('mousedown', () => {
+             // Visual
+             heartBtn.style.transform = "scale(0.9)";
+             // Data
+             set(ref(db, 'status/' + identity + '/pulse'), Date.now());
+        });
+        heartBtn.addEventListener('mouseup', () => heartBtn.style.transform = "scale(1)");
 
-        window.setIdentity = function(role) {
-            localStorage.setItem('user_role', role);
-            modal.style.display = 'none';
-            applyLocks(role);
-        }
-
-        function applyLocks(role) {
-            // If I am Bubu, Lock Mumu's row
-            if (role === 'bubu') {
-                document.getElementById('mood-row-mumu').classList.add('locked-row');
-            } 
-            // If I am Mumu, Lock Bubu's row
-            else if (role === 'mumu') {
-                document.getElementById('mood-row-bubu').classList.add('locked-row');
+        // Listen for Partner Pulse
+        onValue(ref(db, 'status/' + partner + '/pulse'), (snap) => {
+            if(snap.exists() && Date.now() - snap.val() < 2000) {
+                // Partner just clicked!
+                navigator.vibrate(200); // Vibrate phone
+                createSakuraExplosion(); // Visual effect
             }
-        }
-
-        // --- MOODS ---
-        window.setMood = function(person, mood) {
-            set(ref(db, `moods/${person}`), mood);
-        }
-        onValue(ref(db, 'moods'), (snap) => {
-            const data = snap.val() || {};
-            // Update UI
-            document.querySelectorAll('#mood-row-bubu .mood-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === data.bubu));
-            document.querySelectorAll('#mood-row-mumu .mood-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === data.mumu));
         });
 
-        // --- FOCUS TRACKER (Read from DB) ---
-        onValue(ref(db, 'focus'), (snap) => {
+        // --- 2. SONGS & ENERGY ---
+        window.updateEnergy = function() {
+            const val = document.getElementById('my-energy').value;
+            set(ref(db, 'status/' + identity + '/energy'), val);
+        }
+
+        onValue(ref(db, 'status'), (snap) => {
             const data = snap.val() || {};
             
-            // Bubu
-            document.getElementById('focus-bubu-text').innerText = data.bubuText || "No Mission";
-            if(data.bubuDate) {
-                const days = Math.ceil((new Date(data.bubuDate) - new Date()) / (1000 * 60 * 60 * 24));
-                document.getElementById('focus-bubu-days').innerText = days > 0 ? `${days} days left` : "Completed";
-            }
+            // Songs
+            if(data.bubu && data.bubu.song) document.getElementById('song-bubu').innerText = "🎵 " + data.bubu.song;
+            if(data.mumu && data.mumu.song) document.getElementById('song-mumu').innerText = "🎵 " + data.mumu.song;
 
-            // Mumu
-            document.getElementById('focus-mumu-text').innerText = data.mumuText || "No Mission";
-            if(data.mumuDate) {
-                const days = Math.ceil((new Date(data.mumuDate) - new Date()) / (1000 * 60 * 60 * 24));
-                document.getElementById('focus-mumu-days').innerText = days > 0 ? `${days} days left` : "Completed";
+            // Partner Energy
+            if(data[partner] && data[partner].energy) {
+                const e = data[partner].energy;
+                document.getElementById('partner-energy').innerText = e > 80 ? "⚡ High" : (e < 30 ? "😴 Low" : "😊 Okay");
             }
         });
 
-        // --- TIMELINE (Read from DB) ---
-        onValue(ref(db, 'timeline'), (snap) => {
-            const list = document.getElementById('timeline-container');
+        // --- 3. MISSIONS & MEMORIES (Admin Save) ---
+        window.addMission = function() {
+            const date = document.getElementById('admin-date').value;
+            const txt = document.getElementById('admin-mission').value;
+            if(date && txt) {
+                set(ref(db, `missions/${date}`), { text: txt, date: date });
+                alert("Saved!");
+            }
+        }
+        window.addMemory = function() {
+            const txt = document.getElementById('admin-memory').value;
+            if(txt) {
+                push(ref(db, 'memories'), { text: txt, date: new Date().toLocaleDateString() });
+                alert("Saved!");
+            }
+        }
+        // Save Song
+        document.getElementById('admin-song').addEventListener('change', (e) => {
+             set(ref(db, 'status/' + identity + '/song'), e.target.value);
+        });
+
+
+        // --- READ DATA TO UI ---
+        onValue(ref(db, 'missions'), (snap) => {
+            const list = document.getElementById('mission-list');
             list.innerHTML = "";
-            const events = snap.val() || {};
-            
-            // Sort by date key (YYYY-MM-DD)
-            Object.keys(events).sort().forEach(key => {
-                const evt = events[key];
-                const div = document.createElement('div');
-                div.className = 'timeline-event';
-                div.innerHTML = `
-                    <div class="event-dot"></div>
-                    <div>
-                        <div class="event-date">${evt.date}</div>
-                        <div class="event-desc">${evt.title}</div>
-                    </div>
-                `;
-                list.appendChild(div);
+            const data = snap.val() || {};
+            // Simple sort by date
+            Object.keys(data).sort().forEach(key => {
+                const item = data[key];
+                list.innerHTML += `
+                    <div class="mission-item">
+                        <i class="fas fa-thumbtack mission-icon"></i>
+                        <div>
+                            <div style="font-weight:bold; font-size:0.9rem;">${item.text}</div>
+                            <div style="font-size:0.7rem; opacity:0.6;">${item.date}</div>
+                        </div>
+                    </div>`;
             });
         });
 
-        // --- MEMORY BOX (Read from DB) ---
-        let memoryList = ["Loading..."];
         onValue(ref(db, 'memories'), (snap) => {
-            if(snap.exists()) memoryList = Object.values(snap.val());
-            else memoryList = ["No memories added yet!"];
-            shuffleMemory();
-        });
-
-        window.shuffleMemory = function() {
-            const random = memoryList[Math.floor(Math.random() * memoryList.length)];
-            document.getElementById('memory-text').innerText = `"${random}"`;
-        }
-
-        // --- PULSE ---
-        document.getElementById("pulseBtn").addEventListener("click", () => {
-            set(ref(db, 'heartbeats/lastPulse'), Date.now());
-        });
-        onValue(ref(db, 'heartbeats/lastPulse'), (snapshot) => {
-            if (snapshot.exists() && Date.now() - snapshot.val() < 2000) {
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.9 }, colors: ['#ff4d6d', '#ffffff'] });
-            }
+            const timeline = document.getElementById('timeline-container');
+            timeline.innerHTML = "";
+            const data = snap.val() || {};
+            Object.values(data).reverse().forEach(mem => {
+                timeline.innerHTML += `
+                    <div class="memory-card">
+                        <div class="mem-date">${mem.date || 'Memory'}</div>
+                        <div class="mem-text">"${mem.text}"</div>
+                    </div>`;
+            });
         });
 
     </script>
 
     <script>
-        // STARS
-        const starsContainer = document.getElementById('star-container');
-        for(let i=0; i<50; i++) {
-            let star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.width = Math.random() * 2 + 'px';
-            star.style.height = star.style.width;
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-            starsContainer.appendChild(star);
+        // --- SAKURA RAIN ---
+        const sakuraContainer = document.getElementById('sakura-bg');
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.width = Math.random() * 10 + 5 + 'px';
+            petal.style.height = petal.style.width;
+            petal.style.setProperty('--fall-duration', Math.random() * 5 + 5 + 's');
+            petal.style.setProperty('--sway-duration', Math.random() * 2 + 2 + 's');
+            sakuraContainer.appendChild(petal);
+            setTimeout(() => petal.remove(), 10000);
+        }
+        setInterval(createPetal, 500);
+
+        function createSakuraExplosion() {
+            for(let i=0; i<30; i++) setTimeout(createPetal, i*50);
         }
 
-        // TIMER
-        const startDate = new Date("2025-10-21T00:00:00");
-        setInterval(() => {
-            const now = new Date();
-            const diff = now - startDate;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((diff / (1000 * 60)) % 60);
-            const seconds = Math.floor((diff / 1000) % 60);
-            document.getElementById('timer-display').innerText = `${days} Days, ${hours}h ${minutes}m ${seconds}s`;
-        }, 1000);
-
-        // CONSTELLATION LINE
-        const canvas = document.getElementById('constellation');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        function resize() { width = canvas.width = canvas.offsetWidth; height = canvas.height = canvas.offsetHeight; }
-        window.addEventListener('resize', resize); resize();
-        
-        let particleX = 0;
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            ctx.beginPath(); ctx.moveTo(0, height/2); ctx.lineTo(width, height/2);
-            ctx.strokeStyle = "rgba(255, 77, 109, 0.3)"; ctx.lineWidth = 1; ctx.stroke();
+        // --- TAB SWITCHING ---
+        window.switchTab = function(tabName) {
+            // Hide all
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             
-            ctx.beginPath(); ctx.arc(particleX, height/2, 3, 0, Math.PI*2);
-            ctx.fillStyle = "#ff4d6d"; ctx.fill();
-            particleX += 1; if (particleX > width) particleX = 0;
-            requestAnimationFrame(animate);
+            // Show Target
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Highlight Icon
+            const iconIndex = tabName === 'calendar' ? 0 : (tabName === 'home' ? 1 : 2);
+            document.querySelectorAll('.nav-item')[iconIndex].classList.add('active');
         }
-        animate();
+
+        // --- SIMPLE CALENDAR GENERATOR ---
+        const date = new Date();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        document.getElementById('month-display').innerText = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+        
+        const grid = document.getElementById('cal-grid');
+        const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        
+        for(let i=1; i<=daysInMonth; i++) {
+            let day = document.createElement('div');
+            day.className = 'cal-day';
+            day.innerText = i;
+            if(i === date.getDate()) day.classList.add('today');
+            grid.appendChild(day);
+        }
+
+        // --- ADMIN TRIGGER ---
+        let tapCount = 0;
+        document.getElementById('app-title').addEventListener('click', () => {
+            tapCount++;
+            if(tapCount === 3) {
+                document.getElementById('admin-modal').style.display = 'flex';
+                tapCount = 0;
+            }
+        });
+        window.closeAdmin = function() {
+            document.getElementById('admin-modal').style.display = 'none';
+        }
+        
+        // --- SONG PLAY MOCK ---
+        window.playSong = function(who) {
+            alert("This would open Spotify for: " + who);
+        }
+
     </script>
 </body>
 </html>
